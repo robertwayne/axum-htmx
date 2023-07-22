@@ -1,47 +1,9 @@
 use axum::{extract::FromRequestParts, http::request::Parts};
 
-/// Represents all of the headers that can be sent in a request to the server.
-///
-/// See <https://htmx.org/reference/#request_headers> for more information.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum HtmxRequestHeader {
-    /// Indicates that the request is via an element using `hx-boost` attribute.
-    ///
-    /// See <https://htmx.org/attributes/hx-boost/> for more information.
-    Boosted,
-    /// The current URL of the browser.
-    CurrentUrl,
-    /// `true` if the request is for history restoration after a miss in the
-    /// local history cache.
-    HistoryRestoreRequest,
-    /// The user response to an `hx-prompt`
-    ///
-    /// See <https://htmx.org/attributes/hx-prompt/> for more information.
-    Prompt,
-    /// Always `true`.
-    Request,
-    /// The `id` of the target element, if it exists.
-    Target,
-    /// The `name` of the triggered element, if it exists.
-    TriggerName,
-    /// The `id` of the triggered element, if it exists.
-    Trigger,
-}
-
-impl HtmxRequestHeader {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            HtmxRequestHeader::Boosted => "HX-Boosted",
-            HtmxRequestHeader::CurrentUrl => "HX-Current-Url",
-            HtmxRequestHeader::HistoryRestoreRequest => "HX-History-Restore-Request",
-            HtmxRequestHeader::Prompt => "HX-Prompt",
-            HtmxRequestHeader::Request => "HX-Request",
-            HtmxRequestHeader::Target => "HX-Target",
-            HtmxRequestHeader::TriggerName => "HX-Trigger-Name",
-            HtmxRequestHeader::Trigger => "HX-Trigger",
-        }
-    }
-}
+use crate::{
+    HX_BOOSTED, HX_CURRENT_URL, HX_HISTORY_RESTORE_REQUEST, HX_PROMPT, HX_TARGET, HX_TRIGGER,
+    HX_TRIGGER_NAME,
+};
 
 /// The `HX-Boosted` header. This header is set when a request is made with the
 /// "hx-boost" attribute is set on an element.
@@ -61,10 +23,7 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
-        if parts
-            .headers
-            .contains_key(HtmxRequestHeader::Boosted.as_str())
-        {
+        if parts.headers.contains_key(HX_BOOSTED) {
             return Ok(HxBoosted(true));
         } else {
             return Ok(HxBoosted(false));
@@ -83,7 +42,7 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
-        if let Some(url) = parts.headers.get(HtmxRequestHeader::CurrentUrl.as_str()) {
+        if let Some(url) = parts.headers.get(HX_CURRENT_URL) {
             if let Ok(url) = url.to_str() {
                 return Ok(HxCurrentUrl(url.to_string()));
             }
@@ -103,10 +62,7 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
-        if parts
-            .headers
-            .contains_key(HtmxRequestHeader::HistoryRestoreRequest.as_str())
-        {
+        if parts.headers.contains_key(HX_HISTORY_RESTORE_REQUEST) {
             return Ok(HxHistoryRestoreRequest(true));
         } else {
             return Ok(HxHistoryRestoreRequest(false));
@@ -125,7 +81,7 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
-        if let Some(prompt) = parts.headers.get(HtmxRequestHeader::Prompt.as_str()) {
+        if let Some(prompt) = parts.headers.get(HX_PROMPT) {
             if let Ok(prompt) = prompt.to_str() {
                 return Ok(HxPrompt(Some(prompt.to_string())));
             }
@@ -161,7 +117,7 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
-        if let Some(target) = parts.headers.get(HtmxRequestHeader::Target.as_str()) {
+        if let Some(target) = parts.headers.get(HX_TARGET) {
             if let Ok(target) = target.to_str() {
                 return Ok(HxTarget(Some(target.to_string())));
             }
@@ -182,7 +138,7 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
-        if let Some(trigger_name) = parts.headers.get(HtmxRequestHeader::TriggerName.as_str()) {
+        if let Some(trigger_name) = parts.headers.get(HX_TRIGGER_NAME) {
             if let Ok(trigger_name) = trigger_name.to_str() {
                 return Ok(HxTriggerName(Some(trigger_name.to_string())));
             }
@@ -203,7 +159,7 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
-        if let Some(trigger) = parts.headers.get(HtmxRequestHeader::Trigger.as_str()) {
+        if let Some(trigger) = parts.headers.get(HX_TRIGGER) {
             if let Ok(trigger) = trigger.to_str() {
                 return Ok(HxTrigger(Some(trigger.to_string())));
             }
