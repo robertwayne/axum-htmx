@@ -1,9 +1,10 @@
 # axum-htmx
 
 `axum-htmx` is a small extension library providing extractors for the various
- [htmx](https://htmx.org/) headers within [axum](https://github.com/tokio-rs/axum).
-
- __This crate is current a work-in-progress. There are many missing header implementations, and it builds against the upcoming, unreleased branch for `axum`.__
+ [htmx](https://htmx.org/) headers within
+ [axum](https://github.com/tokio-rs/axum). Additionally, the library exports
+ const values for all of the htmx headers, so there's no need to mess with
+ strings in your handlers.
 
 ## Usage
 
@@ -11,13 +12,40 @@
 axum-htmx = { git = "https://github.com/robertwayne/axum-htmx", branch = "main" }
 ```
 
+## Extractors
+
+All of the [htmx request headers](https://htmx.org/reference/#request_headers)
+have a supported extractor. Additionally, all extractors are infallible, meaning
+they will always succeed and never return an error. If the header is not
+present, the extractor will return `None` or `false` in most cases.
+
+| Header | Extractor | Value |
+| --- | --- | --- |
+| `HX-Boosted` | `HxBoosted` | `bool` |
+| `HX-Current-URL` | `HxCurrentUrl` | `Option<String>` |
+| `HX-History-Restore-Request` | `HxHistoryRestoreRequest` | `bool` |
+| `HX-Prompt` | `HxPrompt` | `Option<String>` |
+| `HX-Request` | `HxRequest` | `bool` |
+| `HX-Target` | `HxTarget` | `Option<String>` |
+| `HX-Trigger-Name` | `HxTriggerName` | `Option<String>` |
+| `HX-Trigger` | `HxTrigger` | `Option<String>` |
+
 ## Examples
 
-In this example, we'll look for the `HX-Boosted` header, which is set when applying the [hx-boost](https://htmx.org/attributes/hx-boost/) attribute to an element. In our case, we'll use it to determine what kind of response we send.
+In this example, we'll look for the `HX-Boosted` header, which is set when
+applying the [hx-boost](https://htmx.org/attributes/hx-boost/) attribute to an
+element. In our case, we'll use it to determine what kind of response we send.
 
-When is this useful? When using a templating engine, like [minijinja](https://github.com/mitsuhiko/minijinja), it is common to extend different templates from a `_base.html` template. However, htmx works by sending partial responses, so extending our `_base.html` would result in lots of extra data being sent over the wire.
+When is this useful? When using a templating engine, like
+[minijinja](https://github.com/mitsuhiko/minijinja), it is common to extend
+different templates from a `_base.html` template. However, htmx works by sending
+partial responses, so extending our `_base.html` would result in lots of extra
+data being sent over the wire.
 
-If we wanted to swap between pages, we would need to support both full template responses and partial responses _(as the page can be accessed directly or through a boosted anchor)_, so we look for the `HX-Boosted` header and extend from a `_partial.html` template instead.
+If we wanted to swap between pages, we would need to support both full template
+responses and partial responses _(as the page can be accessed directly or
+through a boosted anchor)_, so we look for the `HX-Boosted` header and extend
+from a `_partial.html` template instead.
 
 ```rs
 async fn get_index(HxBoosted(boosted): HxBoosted) -> impl IntoResponse {
@@ -27,6 +55,13 @@ async fn get_index(HxBoosted(boosted): HxBoosted) -> impl IntoResponse {
         // Send a template extending from _base.html
     }
 }
+```
+
+You can also take advantage of const header values:
+
+```rs
+let mut headers = HeaderMap::new();
+headers.insert(HX_REDIRECT, HeaderValue::from_static("/some/other/page"));
 ```
 
 ## License
