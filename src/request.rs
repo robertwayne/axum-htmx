@@ -5,7 +5,7 @@ use axum::{extract::FromRequestParts, http::request::Parts};
 /// See <https://htmx.org/reference/#request_headers> for more information.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum HtmxRequestHeader {
-    ///	Indicates that the request is via an element using `hx-boost` attribute.
+    /// Indicates that the request is via an element using `hx-boost` attribute.
     ///
     /// See <https://htmx.org/attributes/hx-boost/> for more information.
     Boosted,
