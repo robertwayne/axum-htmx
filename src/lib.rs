@@ -6,7 +6,7 @@ use axum::{extract::FromRequestParts, http::request::Parts};
 ///
 /// See <https://htmx.org/reference/#request_headers> for more information.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum HxRequestHeader {
+pub enum HtmxRequestHeader {
     ///	Indicates that the request is via an element using `hx-boost` attribute.
     ///
     /// See <https://htmx.org/attributes/hx-boost/> for more information.
@@ -30,17 +30,17 @@ pub enum HxRequestHeader {
     Trigger,
 }
 
-impl HxRequestHeader {
+impl HtmxRequestHeader {
     pub fn as_str(&self) -> &'static str {
         match self {
-            HxRequestHeader::Boosted => "HX-Boosted",
-            HxRequestHeader::CurrentUrl => "HX-Current-Url",
-            HxRequestHeader::HistoryRestoreRequest => "HX-History-Restore-Request",
-            HxRequestHeader::Prompt => "HX-Prompt",
-            HxRequestHeader::Request => "HX-Request",
-            HxRequestHeader::Target => "HX-Target",
-            HxRequestHeader::TriggerName => "HX-Trigger-Name",
-            HxRequestHeader::Trigger => "HX-Trigger",
+            HtmxRequestHeader::Boosted => "HX-Boosted",
+            HtmxRequestHeader::CurrentUrl => "HX-Current-Url",
+            HtmxRequestHeader::HistoryRestoreRequest => "HX-History-Restore-Request",
+            HtmxRequestHeader::Prompt => "HX-Prompt",
+            HtmxRequestHeader::Request => "HX-Request",
+            HtmxRequestHeader::Target => "HX-Target",
+            HtmxRequestHeader::TriggerName => "HX-Trigger-Name",
+            HtmxRequestHeader::Trigger => "HX-Trigger",
         }
     }
 }
@@ -49,7 +49,7 @@ impl HxRequestHeader {
 ///
 /// See <https://htmx.org/reference/#response_headers> for more information.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum HxResponseHeader {
+pub enum HtmxResponseHeader {
     /// Allows you to do a client-side redirect that does not do a full page
     /// reload.
     Location,
@@ -86,20 +86,20 @@ pub enum HxResponseHeader {
     TriggerAfterSwap,
 }
 
-impl HxResponseHeader {
+impl HtmxResponseHeader {
     pub fn as_str(&self) -> &'static str {
         match self {
-            HxResponseHeader::Location => "HX-Location",
-            HxResponseHeader::PushUrl => "HX-Push-Url",
-            HxResponseHeader::Redirect => "HX-Redirect",
-            HxResponseHeader::Refresh => "HX-Refresh",
-            HxResponseHeader::ReplaceUrl => "HX-Replace-Url",
-            HxResponseHeader::Reswap => "HX-Reswap",
-            HxResponseHeader::Retarget => "HX-Retarget",
-            HxResponseHeader::Reselect => "HX-Reselect",
-            HxResponseHeader::Trigger => "HX-Trigger",
-            HxResponseHeader::TriggerAfterSettle => "HX-Trigger-After-Settle",
-            HxResponseHeader::TriggerAfterSwap => "HX-Trigger-After-Swap",
+            HtmxResponseHeader::Location => "HX-Location",
+            HtmxResponseHeader::PushUrl => "HX-Push-Url",
+            HtmxResponseHeader::Redirect => "HX-Redirect",
+            HtmxResponseHeader::Refresh => "HX-Refresh",
+            HtmxResponseHeader::ReplaceUrl => "HX-Replace-Url",
+            HtmxResponseHeader::Reswap => "HX-Reswap",
+            HtmxResponseHeader::Retarget => "HX-Retarget",
+            HtmxResponseHeader::Reselect => "HX-Reselect",
+            HtmxResponseHeader::Trigger => "HX-Trigger",
+            HtmxResponseHeader::TriggerAfterSettle => "HX-Trigger-After-Settle",
+            HtmxResponseHeader::TriggerAfterSwap => "HX-Trigger-After-Swap",
         }
     }
 }
@@ -124,7 +124,7 @@ where
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
         if parts
             .headers
-            .contains_key(HxRequestHeader::Boosted.as_str())
+            .contains_key(HtmxRequestHeader::Boosted.as_str())
         {
             return Ok(HxBoosted(true));
         } else {
@@ -144,7 +144,7 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
-        if let Some(url) = parts.headers.get(HxRequestHeader::CurrentUrl.as_str()) {
+        if let Some(url) = parts.headers.get(HtmxRequestHeader::CurrentUrl.as_str()) {
             if let Ok(url) = url.to_str() {
                 return Ok(HxCurrentUrl(url.to_string()));
             }
