@@ -153,3 +153,39 @@ where
         return Ok(HxCurrentUrl("".to_string()));
     }
 }
+
+#[derive(Debug, Clone, Copy)]
+pub struct HxRequest(pub bool);
+
+#[axum::async_trait]
+impl<S> FromRequestParts<S> for HxRequest
+where
+    S: Send + Sync,
+{
+    type Rejection = std::convert::Infallible;
+
+    async fn from_request_parts(_: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
+        return Ok(HxRequest(true));
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct HxTarget(pub Option<String>);
+
+#[axum::async_trait]
+impl<S> FromRequestParts<S> for HxTarget
+where
+    S: Send + Sync,
+{
+    type Rejection = std::convert::Infallible;
+
+    async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
+        if let Some(target) = parts.headers.get(HtmxRequestHeader::Target.as_str()) {
+            if let Ok(target) = target.to_str() {
+                return Ok(HxTarget(Some(target.to_string())));
+            }
+        }
+
+        return Ok(HxTarget(None));
+    }
+}
