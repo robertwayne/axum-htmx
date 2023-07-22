@@ -9,7 +9,6 @@ keywords = ["axum", "htmx", "header", "extractor"]
 readme = "README.md"
 version = "0.1.0"
 edition = "2021"
-publish = false
 
 [dependencies]
 axum = { git = "https://github.com/tokio-rs/axum", branch = "main", default-features = false }
