@@ -1,3 +1,5 @@
+//! Axum extractors for htmx headers.
+
 use axum::{extract::FromRequestParts, http::request::Parts};
 
 use crate::{

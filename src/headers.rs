@@ -1,3 +1,5 @@
+//! HTTP headers used by htmx.
+
 /// Indicates that the request is via an element using `hx-boost` attribute.
 ///
 /// See <https://htmx.org/attributes/hx-boost/> for more information.
