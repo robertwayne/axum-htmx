@@ -28,7 +28,7 @@ against the `main` version of `axum-htmx` by adding the following to your
 
 ```toml
 [dependencies]
-axum-htmx = { git = "https://github.com/robertwayne/axum-htm" }
+axum-htmx = { git = "https://github.com/robertwayne/axum-htmx" }
 ```
 
 ## Extractors
