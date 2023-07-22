@@ -1,8 +1,6 @@
 #![forbid(unsafe_code)]
+pub mod extractors;
 pub mod headers;
-pub mod request;
-pub mod response;
 
+pub use extractors::*;
 pub use headers::*;
-pub use request::*;
-pub use response::*;
