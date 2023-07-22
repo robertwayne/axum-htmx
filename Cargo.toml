@@ -11,4 +11,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-axum = { git = "https://github.com/tokio-rs/axum", branch = "main", default-features = false }
+axum = { version = "0.6", default-features = false }
