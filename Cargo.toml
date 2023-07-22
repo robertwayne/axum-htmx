@@ -1,0 +1,15 @@
+[package]
+name = "axum-htmx"
+authors = ["Rob Wagner <rob@sombia.com>"]
+license = "MIT OR Apache-2.0"
+description = "HTMX header extractors for axum."
+repository = "https://github.com/robertwayne/axum-htmx"
+categories = ["web-programming", "http-server"]
+keywords = ["axum", "htmx", "header", "extractor"]
+readme = "README.md"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+axum = { git = "https://github.com/tokio-rs/axum", branch = "main" }

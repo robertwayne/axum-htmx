@@ -1,0 +1,22 @@
+# Directories
+.cargo/
+.turbo/
+assets/
+build/
+data/
+dist/
+node_modules/
+public/
+target/
+
+# Files
+.env
+.env.development
+.env.production
+.log
+Cargo.lock
+pnpm-lock.yaml
+
+# User Settings
+.idea
+.vscode
