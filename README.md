@@ -22,6 +22,15 @@
 
 Simply run `cargo add axum-htmx` to add the library to your project.
 
+If you are using the unreleased branch of `axum` from GitHub, you can build
+against the `main` version of `axum-htmx` by adding the following to your
+`Cargo.toml`:
+
+```toml
+[dependencies]
+axum-htmx = { git = "https://github.com/robertwayne/axum-htm" }
+```
+
 ## Extractors
 
 All of the [htmx request headers](https://htmx.org/reference/#request_headers)
