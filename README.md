@@ -1,5 +1,16 @@
 # axum-htmx
 
+<!-- markdownlint-disable -->
+<div align="right">
+<a href="https://crates.io/crates/axum-htmx">
+    <img src="https://img.shields.io/crates/v/axum-htmx?style=flat-square" alt="crates.io badge">
+</a>
+<a href="https://docs.rs/axum-htmx/latest/axum-htmx/">
+    <img src="https://img.shields.io/docsrs/axum-htmx?style=flat-square" alt="docs.rs badge">
+</a>
+</div>
+<!-- markdownlint-enable -->
+
 `axum-htmx` is a small extension library providing extractors for the various
  [htmx](https://htmx.org/) headers within
  [axum](https://github.com/tokio-rs/axum). Additionally, the library exports
