@@ -9,6 +9,7 @@
     <img src="https://img.shields.io/docsrs/axum-htmx?style=flat-square" alt="docs.rs badge">
 </a>
 </div>
+<br>
 <!-- markdownlint-enable -->
 
 `axum-htmx` is a small extension library providing extractors for the various
@@ -17,11 +18,9 @@
  const values for all of the htmx headers, so there's no need to mess with
  strings in your handlers.
 
-## Usage
+## Getting Started
 
-```toml
-axum-htmx = { git = "https://github.com/robertwayne/axum-htmx", branch = "main" }
-```
+Simply run `cargo add axum-htmx` to add the library to your project.
 
 ## Extractors
 
@@ -41,7 +40,7 @@ present, the extractor will return `None` or `false` in most cases.
 | `HX-Trigger-Name` | `HxTriggerName` | `Option<String>` |
 | `HX-Trigger` | `HxTrigger` | `Option<String>` |
 
-## Examples
+## Example Usage
 
 In this example, we'll look for the `HX-Boosted` header, which is set when
 applying the [hx-boost](https://htmx.org/attributes/hx-boost/) attribute to an
