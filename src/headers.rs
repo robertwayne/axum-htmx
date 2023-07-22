@@ -4,7 +4,7 @@
 pub const HX_BOOSTED: &str = "HX-Boosted";
 
 /// The current URL of the browser.
-pub const HX_CURRENT_URL: &str = "HX-Current-URL";
+pub const HX_CURRENT_URL: &str = "HX-Current-Url";
 
 /// `true` if the request is for history restoration after a miss in the local
 /// history cache.
