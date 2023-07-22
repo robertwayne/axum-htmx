@@ -93,6 +93,48 @@ where
     }
 }
 
+pub struct HxHistoryRestoreRequest(pub bool);
+
+#[axum::async_trait]
+impl<S> FromRequestParts<S> for HxHistoryRestoreRequest
+where
+    S: Send + Sync,
+{
+    type Rejection = std::convert::Infallible;
+
+    async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
+        if parts
+            .headers
+            .contains_key(HtmxRequestHeader::HistoryRestoreRequest.as_str())
+        {
+            return Ok(HxHistoryRestoreRequest(true));
+        } else {
+            return Ok(HxHistoryRestoreRequest(false));
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct HxPrompt(pub Option<String>);
+
+#[axum::async_trait]
+impl<S> FromRequestParts<S> for HxPrompt
+where
+    S: Send + Sync,
+{
+    type Rejection = std::convert::Infallible;
+
+    async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
+        if let Some(prompt) = parts.headers.get(HtmxRequestHeader::Prompt.as_str()) {
+            if let Ok(prompt) = prompt.to_str() {
+                return Ok(HxPrompt(Some(prompt.to_string())));
+            }
+        }
+
+        return Ok(HxPrompt(None));
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 pub struct HxRequest(pub bool);
 
