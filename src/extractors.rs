@@ -67,6 +67,7 @@ where
 ///
 /// This extractor will always return a value. If the header is not present,
 /// it will return `false`.
+#[derive(Debug, Clone, Copy)]
 pub struct HxHistoryRestoreRequest(pub bool);
 
 #[axum::async_trait]
