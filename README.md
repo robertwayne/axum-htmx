@@ -5,7 +5,7 @@
 <a href="https://crates.io/crates/axum-htmx">
     <img src="https://img.shields.io/crates/v/axum-htmx?style=flat-square" alt="crates.io badge">
 </a>
-<a href="https://docs.rs/axum-htmx/latest/axum-htmx/">
+<a href="https://docs.rs/axum-htmx/latest/">
     <img src="https://img.shields.io/docsrs/axum-htmx?style=flat-square" alt="docs.rs badge">
 </a>
 </div>
