@@ -61,7 +61,7 @@ header is not present, which is useful if you want to make an entire router, say
 _It should be noted that this is NOT a replacement for an auth guard. A user can
 trivially set the `HX-Request` header themselves. This is merely a convenience
 for preventing users from receiving partial responses without context. If you
-need to secure an endpoint, you should be using a proper auth system._
+need to secure an endpoint you should be using a proper auth system._
 
 ## Example: Extractors
 
