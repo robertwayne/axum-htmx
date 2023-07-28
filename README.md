@@ -58,6 +58,12 @@ for the `HX-Request` header. This will return a `403: Forbidden` response if the
 header is not present, which is useful if you want to make an entire router, say
 `/api`, only accessible via htmx requests.
 
+_It should be noted that this is NOT a replacement for authentication. A user
+can trivially set the `HX-Request` header themselves. This is merely a
+convenience for preventing users from receiving partial responses without full
+context. If you need to secure an endpoint, you should be using a proper
+authentication system._
+
 ## Example: Extractors
 
 In this example, we'll look for the `HX-Boosted` header, which is set when
