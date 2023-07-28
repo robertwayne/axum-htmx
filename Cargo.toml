@@ -2,10 +2,10 @@
 name = "axum-htmx"
 authors = ["Rob Wagner <rob@sombia.com>"]
 license = "MIT OR Apache-2.0"
-description = "A set of htmx extractors for axum."
+description = "A set of htmx extractors and request guards for axum."
 repository = "https://github.com/robertwayne/axum-htmx"
 categories = ["web-programming"]
-keywords = ["axum", "htmx", "header", "extractor"]
+keywords = ["axum", "htmx"]
 readme = "README.md"
 version = "0.2.0"
 edition = "2021"
