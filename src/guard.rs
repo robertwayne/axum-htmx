@@ -1,3 +1,5 @@
+//! Request guard for protecting a router against non-htmx requests.
+
 use std::{
     fmt,
     future::Future,
