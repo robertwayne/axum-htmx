@@ -7,8 +7,17 @@ repository = "https://github.com/robertwayne/axum-htmx"
 categories = ["web-programming"]
 keywords = ["axum", "htmx", "header", "extractor"]
 readme = "README.md"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+
+[features]
+default = []
+guards = ["tower", "futures-core", "pin-project-lite"]
 
 [dependencies]
 axum = { git = "https://github.com/tokio-rs/axum", branch = "main", default-features = false }
+
+# Optional dependencies
+tower = { version = "0.4", default-features = false, optional = true }
+futures-core = { version = "0.3", optional = true }
+pin-project-lite = { version = "0.2", optional = true }

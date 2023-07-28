@@ -49,7 +49,16 @@ present, the extractor will return `None` or `false` in most cases.
 | `HX-Trigger-Name` | `HxTriggerName` | `Option<String>` |
 | `HX-Trigger` | `HxTrigger` | `Option<String>` |
 
-## Example Usage
+## Request Guards
+
+__Requires features `guards`.__
+
+In addition to the extractors, there is also a route-wide layer request guard
+for the `HX-Request` header. This will return a `403: Forbidden` response if the
+header is not present, which is useful if you want to make an entire router, say
+`/api`, only accessible via htmx requests.
+
+## Example: Extractors
 
 In this example, we'll look for the `HX-Boosted` header, which is set when
 applying the [hx-boost](https://htmx.org/attributes/hx-boost/) attribute to an
@@ -67,6 +76,9 @@ through a boosted anchor)_, so we look for the `HX-Boosted` header and extend
 from a `_partial.html` template instead.
 
 ```rs
+use axum::response::IntoResponse;
+use axum_htmx::HxBoosted;
+
 async fn get_index(HxBoosted(boosted): HxBoosted) -> impl IntoResponse {
     if boosted {
         // Send a template extending from _partial.html
@@ -76,12 +88,25 @@ async fn get_index(HxBoosted(boosted): HxBoosted) -> impl IntoResponse {
 }
 ```
 
-You can also take advantage of const header values:
+### Example: Router Guard
 
 ```rs
-let mut headers = HeaderMap::new();
-headers.insert(HX_REDIRECT, HeaderValue::from_static("/some/other/page"));
+use axum::Router;
+use axum_htmx::HxRequestGuardLayer;
+
+fn protected_router() -> Router {
+    Router::new()
+        .layer(HxRequestGuardLayer::new())
+}
 ```
+
+### Feature Flags
+
+<!-- markdownlint-disable -->
+| Flag | Default  | Description | Dependencies |
+|-|-|-|-|
+| `guards`| Disabled | Adds request guard layers. | `tower`, `futures-core`, `pin-project-lite` |
+<!-- markdownlint-enable -->
 
 ## License
 
