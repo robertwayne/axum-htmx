@@ -80,7 +80,7 @@ responses and partial responses _(as the page can be accessed directly or
 through a boosted anchor)_, so we look for the `HX-Boosted` header and extend
 from a `_partial.html` template instead.
 
-```rs
+```rust
 use axum::response::IntoResponse;
 use axum_htmx::HxBoosted;
 
@@ -95,7 +95,7 @@ async fn get_index(HxBoosted(boosted): HxBoosted) -> impl IntoResponse {
 
 ### Example: Router Guard
 
-```rs
+```rust
 use axum::Router;
 use axum_htmx::HxRequestGuardLayer;
 
