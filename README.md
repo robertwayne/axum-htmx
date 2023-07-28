@@ -12,8 +12,8 @@
 <br>
 <!-- markdownlint-enable -->
 
-`axum-htmx` is a small extension library providing extractors for the various
- [htmx](https://htmx.org/) headers within
+`axum-htmx` is a small extension library providing extractors and request guards
+ for the various [htmx](https://htmx.org/) headers within
  [axum](https://github.com/tokio-rs/axum). Additionally, the library exports
  const values for all of the htmx headers, so there's no need to mess with
  strings in your handlers.
