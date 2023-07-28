@@ -5,15 +5,15 @@
 <a href="https://crates.io/crates/axum-htmx">
     <img src="https://img.shields.io/crates/v/axum-htmx?style=flat-square" alt="crates.io badge">
 </a>
-<a href="https://docs.rs/axum-htmx/latest/axum-htmx/">
+<a href="https://docs.rs/axum-htmx/latest/">
     <img src="https://img.shields.io/docsrs/axum-htmx?style=flat-square" alt="docs.rs badge">
 </a>
 </div>
 <br>
 <!-- markdownlint-enable -->
 
-`axum-htmx` is a small extension library providing extractors for the various
- [htmx](https://htmx.org/) headers within
+`axum-htmx` is a small extension library providing extractors and request guards
+ for the various [htmx](https://htmx.org/) headers within
  [axum](https://github.com/tokio-rs/axum). Additionally, the library exports
  const values for all of the htmx headers, so there's no need to mess with
  strings in your handlers.
@@ -21,6 +21,15 @@
 ## Getting Started
 
 Simply run `cargo add axum-htmx` to add the library to your project.
+
+If you are using the unreleased branch of `axum` from GitHub, you can build
+against the `main` version of `axum-htmx` by adding the following to your
+`Cargo.toml`:
+
+```toml
+[dependencies]
+axum-htmx = { git = "https://github.com/robertwayne/axum-htmx" }
+```
 
 ## Extractors
 
@@ -40,7 +49,16 @@ present, the extractor will return `None` or `false` in most cases.
 | `HX-Trigger-Name` | `HxTriggerName` | `Option<String>` |
 | `HX-Trigger` | `HxTrigger` | `Option<String>` |
 
-## Example Usage
+## Request Guards
+
+__Requires features `guards`.__
+
+In addition to the extractors, there is also a route-wide layer request guard
+for the `HX-Request` header. This will return a `403: Forbidden` response if the
+header is not present, which is useful if you want to make an entire router, say
+`/api`, only accessible via htmx requests.
+
+## Example: Extractors
 
 In this example, we'll look for the `HX-Boosted` header, which is set when
 applying the [hx-boost](https://htmx.org/attributes/hx-boost/) attribute to an
@@ -58,6 +76,9 @@ through a boosted anchor)_, so we look for the `HX-Boosted` header and extend
 from a `_partial.html` template instead.
 
 ```rs
+use axum::response::IntoResponse;
+use axum_htmx::HxBoosted;
+
 async fn get_index(HxBoosted(boosted): HxBoosted) -> impl IntoResponse {
     if boosted {
         // Send a template extending from _partial.html
@@ -67,18 +88,37 @@ async fn get_index(HxBoosted(boosted): HxBoosted) -> impl IntoResponse {
 }
 ```
 
-You can also take advantage of const header values:
+### Example: Router Guard
 
 ```rs
-let mut headers = HeaderMap::new();
-headers.insert(HX_REDIRECT, HeaderValue::from_static("/some/other/page"));
+use axum::Router;
+use axum_htmx::HxRequestGuardLayer;
+
+fn protected_router() -> Router {
+    Router::new()
+        .layer(HxRequestGuardLayer::new())
+}
 ```
+
+### Feature Flags
+
+<!-- markdownlint-disable -->
+| Flag | Default  | Description | Dependencies |
+|-|-|-|-|
+| `guards`| Disabled | Adds request guard layers. | `tower`, `futures-core`, `pin-project-lite` |
+<!-- markdownlint-enable -->
+
+## Contributing
+
+Contributions are always welcome! If you have an idea for a feature or find a
+bug, let me know. PR's are appreciated, but if it's not a small change, please
+open an issue first so we're all on the same page!
 
 ## License
 
 `axum-htmx` is dual-licensed under either
 
-- **[MIT License](/docs/LICENSE-MIT)**
-- **[Apache License, Version 2.0](/docs/LICENSE-APACHE)**
+- **[MIT License](/LICENSE-MIT)**
+- **[Apache License, Version 2.0](/LICENSE-APACHE)**
 
 at your option.
