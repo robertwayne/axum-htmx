@@ -38,16 +38,16 @@ have a supported extractor. Additionally, all extractors are infallible, meaning
 they will always succeed and never return an error. If the header is not
 present, the extractor will return `None` or `false` in most cases.
 
-| Header | Extractor | Value |
-| --- | --- | --- |
-| `HX-Boosted` | `HxBoosted` | `bool` |
-| `HX-Current-URL` | `HxCurrentUrl` | `Option<String>` |
-| `HX-History-Restore-Request` | `HxHistoryRestoreRequest` | `bool` |
-| `HX-Prompt` | `HxPrompt` | `Option<String>` |
-| `HX-Request` | `HxRequest` | `bool` |
-| `HX-Target` | `HxTarget` | `Option<String>` |
-| `HX-Trigger-Name` | `HxTriggerName` | `Option<String>` |
-| `HX-Trigger` | `HxTrigger` | `Option<String>` |
+| Header                       | Extractor                 | Value            |
+|------------------------------|---------------------------|------------------|
+| `HX-Boosted`                 | `HxBoosted`               | `bool`           |
+| `HX-Current-URL`             | `HxCurrentUrl`            | `Option<String>` |
+| `HX-History-Restore-Request` | `HxHistoryRestoreRequest` | `bool`           |
+| `HX-Prompt`                  | `HxPrompt`                | `Option<String>` |
+| `HX-Request`                 | `HxRequest`               | `bool`           |
+| `HX-Target`                  | `HxTarget`                | `Option<String>` |
+| `HX-Trigger-Name`            | `HxTriggerName`           | `Option<String>` |
+| `HX-Trigger`                 | `HxTrigger`               | `Option<String>` |
 
 ## Request Guards
 
@@ -108,9 +108,9 @@ fn protected_router() -> Router {
 ### Feature Flags
 
 <!-- markdownlint-disable -->
-| Flag | Default  | Description | Dependencies |
-|-|-|-|-|
-| `guards`| Disabled | Adds request guard layers. | `tower`, `futures-core`, `pin-project-lite` |
+| Flag     | Default  | Description                | Dependencies                                |
+|----------|----------|----------------------------|---------------------------------------------|
+| `guards` | Disabled | Adds request guard layers. | `tower`, `futures-core`, `pin-project-lite` |
 <!-- markdownlint-enable -->
 
 ## Contributing
