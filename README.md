@@ -108,6 +108,12 @@ fn protected_router() -> Router {
 | `guards`| Disabled | Adds request guard layers. | `tower`, `futures-core`, `pin-project-lite` |
 <!-- markdownlint-enable -->
 
+## Contributing
+
+Contributions are always welcome! If you have an idea for a feature or find a
+bug, let me know. PR's are appreciated, but if it's not a small change, please
+open an issue first so we're all on the same page!
+
 ## License
 
 `axum-htmx` is dual-licensed under either
