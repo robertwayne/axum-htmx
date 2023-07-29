@@ -38,25 +38,29 @@ have a supported extractor. Additionally, all extractors are infallible, meaning
 they will always succeed and never return an error. If the header is not
 present, the extractor will return `None` or `false` in most cases.
 
-| Header | Extractor | Value |
-| --- | --- | --- |
-| `HX-Boosted` | `HxBoosted` | `bool` |
-| `HX-Current-URL` | `HxCurrentUrl` | `Option<String>` |
-| `HX-History-Restore-Request` | `HxHistoryRestoreRequest` | `bool` |
-| `HX-Prompt` | `HxPrompt` | `Option<String>` |
-| `HX-Request` | `HxRequest` | `bool` |
-| `HX-Target` | `HxTarget` | `Option<String>` |
-| `HX-Trigger-Name` | `HxTriggerName` | `Option<String>` |
-| `HX-Trigger` | `HxTrigger` | `Option<String>` |
+| Header                       | Extractor                 | Value            |
+|------------------------------|---------------------------|------------------|
+| `HX-Boosted`                 | `HxBoosted`               | `bool`           |
+| `HX-Current-URL`             | `HxCurrentUrl`            | `Option<String>` |
+| `HX-History-Restore-Request` | `HxHistoryRestoreRequest` | `bool`           |
+| `HX-Prompt`                  | `HxPrompt`                | `Option<String>` |
+| `HX-Request`                 | `HxRequest`               | `bool`           |
+| `HX-Target`                  | `HxTarget`                | `Option<String>` |
+| `HX-Trigger-Name`            | `HxTriggerName`           | `Option<String>` |
+| `HX-Trigger`                 | `HxTrigger`               | `Option<String>` |
 
 ## Request Guards
 
 __Requires features `guards`.__
 
 In addition to the extractors, there is also a route-wide layer request guard
-for the `HX-Request` header. This will return a `403: Forbidden` response if the
-header is not present, which is useful if you want to make an entire router, say
-`/api`, only accessible via htmx requests.
+for the `HX-Request` header. This will redirect any requests without the header
+to "/" by default.
+
+_It should be noted that this is NOT a replacement for an auth guard. A user can
+trivially set the `HX-Request` header themselves. This is merely a convenience
+for preventing users from receiving partial responses without context. If you
+need to secure an endpoint you should be using a proper auth system._
 
 ## Example: Extractors
 
@@ -75,7 +79,7 @@ responses and partial responses _(as the page can be accessed directly or
 through a boosted anchor)_, so we look for the `HX-Boosted` header and extend
 from a `_partial.html` template instead.
 
-```rs
+```rust
 use axum::response::IntoResponse;
 use axum_htmx::HxBoosted;
 
@@ -90,22 +94,28 @@ async fn get_index(HxBoosted(boosted): HxBoosted) -> impl IntoResponse {
 
 ### Example: Router Guard
 
-```rs
+```rust
 use axum::Router;
 use axum_htmx::HxRequestGuardLayer;
 
 fn protected_router() -> Router {
     Router::new()
-        .layer(HxRequestGuardLayer::new())
+        // Redirects to "/" if the HX-Request header is not present
+        .layer(HxRequestGuardLayer::default())
+}
+
+fn other_route() -> Router {
+    Router::new()
+        .layer(HxRequestGuardLayer::new("/redirect-to-this-route"))
 }
 ```
 
 ### Feature Flags
 
 <!-- markdownlint-disable -->
-| Flag | Default  | Description | Dependencies |
-|-|-|-|-|
-| `guards`| Disabled | Adds request guard layers. | `tower`, `futures-core`, `pin-project-lite` |
+| Flag     | Default  | Description                | Dependencies                                |
+|----------|----------|----------------------------|---------------------------------------------|
+| `guards` | Disabled | Adds request guard layers. | `tower`, `futures-core`, `pin-project-lite` |
 <!-- markdownlint-enable -->
 
 ## Contributing
