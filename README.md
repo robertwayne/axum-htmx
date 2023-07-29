@@ -98,13 +98,13 @@ async fn get_index(HxBoosted(boosted): HxBoosted) -> impl IntoResponse {
 use axum::Router;
 use axum_htmx::HxRequestGuardLayer;
 
-fn protected_router() -> Router {
+fn router_one() -> Router {
     Router::new()
         // Redirects to "/" if the HX-Request header is not present
         .layer(HxRequestGuardLayer::default())
 }
 
-fn other_route() -> Router {
+fn router_two() -> Router {
     Router::new()
         .layer(HxRequestGuardLayer::new("/redirect-to-this-route"))
 }
