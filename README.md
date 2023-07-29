@@ -54,9 +54,8 @@ present, the extractor will return `None` or `false` in most cases.
 __Requires features `guards`.__
 
 In addition to the extractors, there is also a route-wide layer request guard
-for the `HX-Request` header. This will return a `403: Forbidden` response if the
-header is not present, which is useful if you want to make an entire router, say
-`/api`, only accessible via htmx requests.
+for the `HX-Request` header. This will redirect any requests without the header
+to "/" by default.
 
 _It should be noted that this is NOT a replacement for an auth guard. A user can
 trivially set the `HX-Request` header themselves. This is merely a convenience
@@ -101,7 +100,7 @@ use axum_htmx::HxRequestGuardLayer;
 
 fn protected_router() -> Router {
     Router::new()
-        .layer(HxRequestGuardLayer::new())
+        .layer(HxRequestGuardLayer::default())
 }
 ```
 

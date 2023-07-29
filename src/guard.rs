@@ -17,11 +17,11 @@ use tower::{Layer, Service};
 
 use crate::HX_REQUEST;
 
-/// Checks if the request contains the `HX-Request` header, returning a `403:
-/// Forbidden` response if the header is not present.
+/// Checks if the request contains the `HX-Request` header, redirecting to the
+/// given location if not.
 ///
-/// This can be used to protect routes that should only be accessed via htmx
-/// requests.
+/// This can be useful for preventing users from accidently ending up on a route
+/// which would otherwise return only partial HTML data.
 #[derive(Debug, Clone)]
 pub struct HxRequestGuardLayer<'a> {
     redirect_to: &'a str,
