@@ -100,7 +100,13 @@ use axum_htmx::HxRequestGuardLayer;
 
 fn protected_router() -> Router {
     Router::new()
+        // Redirects to "/" if the HX-Request header is not present
         .layer(HxRequestGuardLayer::default())
+}
+
+fn other_route() -> Router {
+    Router::new()
+        .layer(HxRequestGuardLayer::new("/redirect-to-this-route"))
 }
 ```
 
