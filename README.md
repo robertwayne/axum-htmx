@@ -34,9 +34,10 @@ axum-htmx = { git = "https://github.com/robertwayne/axum-htmx" }
 ## Extractors
 
 All of the [htmx request headers](https://htmx.org/reference/#request_headers)
-have a supported extractor. Additionally, all extractors are infallible, meaning
-they will always succeed and never return an error. If the header is not
-present, the extractor will return `None` or `false` in most cases.
+have a supported extractor. Extractors are infallible, meaning they will always
+succeed and never return an error. In the case where a header is not present,
+the extractor will return `None` or `false` dependant on the expected return
+type.
 
 | Header                       | Extractor                 | Value            |
 |------------------------------|---------------------------|------------------|
