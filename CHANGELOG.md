@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.1
+
+- Rebuild docs with features enabled so `HxRequestGuardLayer` is visible on
+  docs.rs.
+
 ## v0.3.0
 
 - `HxRequestGuardLayer` now redirects on failures instead of returning a 403. By
