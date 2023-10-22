@@ -11,9 +11,9 @@ version = "0.3.1"
 edition = "2021"
 
 [features]
-default = [ "responders" ]
+default = [ ]
 guards = ["tower", "futures-core", "pin-project-lite"]
-responders = ["serde", "serde_json"]
+serde = [ "dep:serde", "dep:serde_json" ]
 
 [dependencies]
 axum = { git = "https://github.com/tokio-rs/axum", branch = "main", default-features = false }

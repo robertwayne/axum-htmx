@@ -1,15 +1,14 @@
-//pub struct HxLocation()
-
-use std::{collections::HashMap, convert::Infallible};
+use std::convert::Infallible;
 
 use axum::{
     http::{header::InvalidHeaderValue, HeaderValue, StatusCode, Uri},
     response::{IntoResponse, IntoResponseParts, ResponseParts},
 };
-use serde::Serialize;
-use serde_json::Value;
 
 use crate::headers;
+
+#[cfg(feature = "serde")]
+pub mod serde;
 
 const HX_SWAP_INNER_HTML: &str = "innerHTML";
 const HX_SWAP_OUTER_HTML: &str = "outerHTML";
@@ -22,62 +21,20 @@ const HX_SWAP_NONE: &str = "none";
 
 /// The `HX-Location` header.
 ///
-/// This response header can be used to trigger a client side redirection without reloading the whole page. Instead of changing the page’s location it will act like following a hx-boost link, creating a new history entry, issuing an ajax request to the value of the header and pushing the path into history.
+/// This response header can be used to trigger a client side redirection without reloading the whole page.
 ///
-///
-#[derive(Debug, Clone, Serialize)]
-pub struct HxLocation {
-    /// Url to load the response from
-    pub path: String,
-    /// The source element of the request
-    pub source: Option<String>,
-    /// An event that "triggered" the request
-    pub event: Option<String>,
-    /// A callback that will handle the response HTML
-    pub handler: Option<String>,
-    /// The target to swap the response into
-    pub target: Option<String>,
-    /// How the response will be swapped in relative to the target
-    pub swap: Option<SwapOption>,
-    /// Values to submit with the request
-    pub values: Option<Value>,
-    /// headers to submit with the request
-    pub headers: Option<Value>,
-}
-
-impl HxLocation {
-    pub fn from_uri(uri: &Uri) -> Self {
-        Self {
-            path: uri.to_string(),
-            source: None,
-            event: None,
-            handler: None,
-            target: None,
-            swap: None,
-            values: None,
-            headers: None,
-        }
-    }
-}
+/// Will fail if the supplied Uri contains characters that are not visible ASCII (32-127).
+#[derive(Debug, Clone)]
+pub struct HxLocation(Uri);
 
 impl IntoResponseParts for HxLocation {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
-        let header_value = if self.source.is_none()
-            && self.event.is_none()
-            && self.handler.is_none()
-            && self.target.is_none()
-            && self.swap.is_none()
-            && self.values.is_none()
-            && self.headers.is_none()
-        {
-            HeaderValue::from_str(&self.path)?
-        } else {
-            HeaderValue::from_maybe_shared(serde_json::to_string(&self)?)?
-        };
-
-        res.headers_mut().insert(headers::HX_LOCATION, header_value);
+        res.headers_mut().insert(
+            headers::HX_LOCATION,
+            HeaderValue::from_maybe_shared(self.0.to_string())?,
+        );
         Ok(res)
     }
 }
@@ -226,16 +183,23 @@ impl IntoResponseParts for HxReselect {
 ///
 /// Allows you to trigger client-side events.
 ///
-/// Will fail if the supplied events contain produce characters that are not visible ASCII (32-127) when serializing to json.
+/// Will fail if the supplied events contain or produce characters that are not visible ASCII (32-127) when serializing to json.
 #[derive(Debug, Clone)]
-pub struct HxTrigger(Vec<HxEvent>);
+pub struct HxTrigger(Vec<String>);
 
 impl IntoResponseParts for HxTrigger {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
-        res.headers_mut()
-            .insert(headers::HX_TRIGGER, events_to_header_value(self.0)?);
+        res.headers_mut().insert(
+            headers::HX_TRIGGER,
+            HeaderValue::from_maybe_shared(
+                self.0
+                    .into_iter()
+                    .reduce(|acc, e| acc + ", " + &e)
+                    .unwrap_or_default(),
+            )?,
+        );
         Ok(res)
     }
 }
@@ -244,9 +208,9 @@ impl IntoResponseParts for HxTrigger {
 ///
 /// Allows you to trigger client-side events after the settle step.
 ///
-/// Will fail if the supplied events contain produce characters that are not visible ASCII (32-127) when serializing to json.
+/// Will fail if the supplied events contain or produce characters that are not visible ASCII (32-127) when serializing to json.
 #[derive(Debug, Clone)]
-pub struct HxTriggerAfterSettle(Vec<HxEvent>);
+pub struct HxTriggerAfterSettle(Vec<String>);
 
 impl IntoResponseParts for HxTriggerAfterSettle {
     type Error = HxError;
@@ -254,7 +218,12 @@ impl IntoResponseParts for HxTriggerAfterSettle {
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
         res.headers_mut().insert(
             headers::HX_TRIGGER_AFTER_SETTLE,
-            events_to_header_value(self.0)?,
+            HeaderValue::from_maybe_shared(
+                self.0
+                    .into_iter()
+                    .reduce(|acc, e| acc + ", " + &e)
+                    .unwrap_or_default(),
+            )?,
         );
         Ok(res)
     }
@@ -264,9 +233,9 @@ impl IntoResponseParts for HxTriggerAfterSettle {
 ///
 /// Allows you to trigger client-side events after the swap step.
 ///
-/// Will fail if the supplied events contain produce characters that are not visible ASCII (32-127) when serializing to json.
+/// Will fail if the supplied events contain or produce characters that are not visible ASCII (32-127) when serializing to json.
 #[derive(Debug, Clone)]
-pub struct HxTriggerAfterSwap(Vec<HxEvent>);
+pub struct HxTriggerAfterSwap(Vec<String>);
 
 impl IntoResponseParts for HxTriggerAfterSwap {
     type Error = HxError;
@@ -274,13 +243,19 @@ impl IntoResponseParts for HxTriggerAfterSwap {
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
         res.headers_mut().insert(
             headers::HX_TRIGGER_AFTER_SWAP,
-            events_to_header_value(self.0)?,
+            HeaderValue::from_maybe_shared(
+                self.0
+                    .into_iter()
+                    .reduce(|acc, e| acc + ", " + &e)
+                    .unwrap_or_default(),
+            )?,
         );
         Ok(res)
     }
 }
 
 /// Values of the `hx-swap` attribute.
+// serde::Serialize is implemented in responders/serde.rs
 #[derive(Debug, Copy, Clone)]
 pub enum SwapOption {
     /// Replace the inner html of the target element.
@@ -316,76 +291,10 @@ impl From<SwapOption> for HeaderValue {
     }
 }
 
-// can be removed  and automatically derived when https://github.com/serde-rs/serde/issues/2485
-// is implemented
-impl Serialize for SwapOption {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        const UNIT_NAME: &str = "SwapOption";
-        match self {
-            Self::InnerHtml => serializer.serialize_unit_variant(UNIT_NAME, 0, HX_SWAP_INNER_HTML),
-            Self::OuterHtml => serializer.serialize_unit_variant(UNIT_NAME, 1, HX_SWAP_OUTER_HTML),
-            Self::BeforeBegin => {
-                serializer.serialize_unit_variant(UNIT_NAME, 2, HX_SWAP_BEFORE_BEGIN)
-            }
-            Self::AfterBegin => {
-                serializer.serialize_unit_variant(UNIT_NAME, 3, HX_SWAP_AFTER_BEGIN)
-            }
-            Self::BeforeEnd => serializer.serialize_unit_variant(UNIT_NAME, 4, HX_SWAP_BEFORE_END),
-            Self::AfterEnd => serializer.serialize_unit_variant(UNIT_NAME, 5, HX_SWAP_AFTER_END),
-            Self::Delete => serializer.serialize_unit_variant(UNIT_NAME, 6, HX_SWAP_DELETE),
-            Self::None => serializer.serialize_unit_variant(UNIT_NAME, 7, HX_SWAP_NONE),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize)]
-pub struct HxEvent {
-    pub name: String,
-    pub data: Option<Value>,
-}
-
-impl HxEvent {
-    pub fn new<T: Serialize>(name: String) -> Self {
-        Self { name, data: None }
-    }
-    pub fn new_with_data<T: Serialize>(name: String, data: T) -> Result<Self, serde_json::Error> {
-        let data = serde_json::to_value(data)?;
-
-        Ok(Self {
-            name,
-            data: Some(data),
-        })
-    }
-}
-
-pub(crate) fn events_to_header_value(events: Vec<HxEvent>) -> Result<HeaderValue, HxError> {
-    let with_data = events.iter().any(|e| e.data.is_some());
-
-    let header_value = if with_data {
-        // at least one event contains data so the header_value needs to be json encoded.
-        let header_value = events
-            .into_iter()
-            .map(|e| (e.name, e.data.map(|d| d.to_string()).unwrap_or_default()))
-            .collect::<HashMap<_, _>>();
-        serde_json::to_string(&header_value)?
-    } else {
-        // no event contains data, the event names can be put in the header value separated
-        // by a comma.
-        events
-            .into_iter()
-            .map(|e| e.name)
-            .reduce(|acc, e| acc + ", " + &e)
-            .unwrap_or_default()
-    };
-
-    HeaderValue::from_maybe_shared(header_value).map_err(HxError::from)
-}
-
 pub enum HxError {
     InvalidHeaderValue(InvalidHeaderValue),
+
+    #[cfg(feature = "serde")]
     Serialization(serde_json::Error),
 }
 
@@ -395,6 +304,7 @@ impl From<InvalidHeaderValue> for HxError {
     }
 }
 
+#[cfg(feature = "serde")]
 impl From<serde_json::Error> for HxError {
     fn from(value: serde_json::Error) -> Self {
         Self::Serialization(value)
@@ -407,6 +317,8 @@ impl IntoResponse for HxError {
             Self::InvalidHeaderValue(_) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, "invalid header value").into_response()
             }
+
+            #[cfg(feature = "serde")]
             Self::Serialization(_) => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "failed to serialize event",
