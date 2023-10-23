@@ -84,7 +84,7 @@ impl IntoResponseParts for HxLocation {
 ///
 /// Will fail if the supplied events contain or produce characters that are not visible ASCII (32-127) when serializing to json.
 #[derive(Debug, Clone)]
-pub struct HxTrigger(Vec<HxEvent>);
+pub struct HxTrigger(pub Vec<HxEvent>);
 
 impl IntoResponseParts for HxTrigger {
     type Error = HxError;

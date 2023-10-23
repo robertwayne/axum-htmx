@@ -25,7 +25,7 @@ const HX_SWAP_NONE: &str = "none";
 ///
 /// Will fail if the supplied Uri contains characters that are not visible ASCII (32-127).
 #[derive(Debug, Clone)]
-pub struct HxLocation(Uri);
+pub struct HxLocation(pub Uri);
 
 impl IntoResponseParts for HxLocation {
     type Error = HxError;
@@ -45,7 +45,7 @@ impl IntoResponseParts for HxLocation {
 ///
 /// Will fail if the supplied Uri contains characters that are not visible ASCII (32-127).
 #[derive(Debug, Clone)]
-pub struct HxPushUrl(Uri);
+pub struct HxPushUrl(pub Uri);
 
 impl IntoResponseParts for HxPushUrl {
     type Error = HxError;
@@ -65,7 +65,7 @@ impl IntoResponseParts for HxPushUrl {
 ///
 /// Will fail if the supplied Uri contains characters that are not visible ASCII (32-127).
 #[derive(Debug, Clone)]
-pub struct HxRedirect(Uri);
+pub struct HxRedirect(pub Uri);
 
 impl IntoResponseParts for HxRedirect {
     type Error = HxError;
@@ -85,7 +85,7 @@ impl IntoResponseParts for HxRedirect {
 ///
 /// This responder will never fail.
 #[derive(Debug, Copy, Clone)]
-pub struct HxRefresh(bool);
+pub struct HxRefresh(pub bool);
 
 impl IntoResponseParts for HxRefresh {
     type Error = Infallible;
@@ -108,7 +108,7 @@ impl IntoResponseParts for HxRefresh {
 ///
 /// Will fail if the supplied Uri contains characters that are not visible ASCII (32-127).
 #[derive(Debug, Clone)]
-pub struct HxReplaceUrl(Uri);
+pub struct HxReplaceUrl(pub Uri);
 
 impl IntoResponseParts for HxReplaceUrl {
     type Error = HxError;
@@ -128,7 +128,7 @@ impl IntoResponseParts for HxReplaceUrl {
 ///
 /// This responder will never fail.
 #[derive(Debug, Copy, Clone)]
-pub struct HxReswap(SwapOption);
+pub struct HxReswap(pub SwapOption);
 
 impl IntoResponseParts for HxReswap {
     type Error = Infallible;
@@ -145,7 +145,7 @@ impl IntoResponseParts for HxReswap {
 ///
 /// Will fail if the supplied String contains characters that are not visible ASCII (32-127).
 #[derive(Debug, Clone)]
-pub struct HxRetarget(String);
+pub struct HxRetarget(pub String);
 
 impl IntoResponseParts for HxRetarget {
     type Error = HxError;
@@ -165,7 +165,7 @@ impl IntoResponseParts for HxRetarget {
 ///
 /// Will fail if the supplied String contains characters that are not visible ASCII (32-127).
 #[derive(Debug, Clone)]
-pub struct HxReselect(String);
+pub struct HxReselect(pub String);
 
 impl IntoResponseParts for HxReselect {
     type Error = HxError;
@@ -185,9 +185,9 @@ impl IntoResponseParts for HxReselect {
 ///
 /// Will fail if the supplied events contain or produce characters that are not visible ASCII (32-127) when serializing to json.
 #[derive(Debug, Clone)]
-pub struct HxTrigger(Vec<String>);
+pub struct HxResponseTrigger(pub Vec<String>);
 
-impl IntoResponseParts for HxTrigger {
+impl IntoResponseParts for HxResponseTrigger {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
@@ -210,9 +210,9 @@ impl IntoResponseParts for HxTrigger {
 ///
 /// Will fail if the supplied events contain or produce characters that are not visible ASCII (32-127) when serializing to json.
 #[derive(Debug, Clone)]
-pub struct HxTriggerAfterSettle(Vec<String>);
+pub struct HxResponseTriggerAfterSettle(pub Vec<String>);
 
-impl IntoResponseParts for HxTriggerAfterSettle {
+impl IntoResponseParts for HxResponseTriggerAfterSettle {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
@@ -235,9 +235,9 @@ impl IntoResponseParts for HxTriggerAfterSettle {
 ///
 /// Will fail if the supplied events contain or produce characters that are not visible ASCII (32-127) when serializing to json.
 #[derive(Debug, Clone)]
-pub struct HxTriggerAfterSwap(Vec<String>);
+pub struct HxResponseTriggerAfterSwap(pub Vec<String>);
 
-impl IntoResponseParts for HxTriggerAfterSwap {
+impl IntoResponseParts for HxResponseTriggerAfterSwap {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
