@@ -50,6 +50,8 @@ impl IntoResponseParts for HxLocation {
 ///
 /// Will fail if the supplied Uri contains characters that are not visible ASCII
 /// (32-127).
+///
+/// See <https://htmx.org/headers/hx-push-url/> for more information.
 #[derive(Debug, Clone)]
 pub struct HxPushUrl(pub Uri);
 
@@ -118,6 +120,8 @@ impl IntoResponseParts for HxRefresh {
 ///
 /// Will fail if the supplied Uri contains characters that are not visible ASCII
 /// (32-127).
+///
+/// See <https://htmx.org/headers/hx-replace-url/> for more information.
 #[derive(Debug, Clone)]
 pub struct HxReplaceUrl(pub Uri);
 
@@ -200,10 +204,14 @@ impl IntoResponseParts for HxReselect {
 
 /// The `HX-Trigger` header.
 ///
-/// Allows you to trigger client-side events.
+/// Allows you to trigger client-side events. This only accepts events without
+/// data attached. If you intend to add data to the event, you must enable the
+/// `serde` feature flag.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
-/// visible ASCII (32-127) when serializing to json.
+/// visible ASCII (32-127) when serializing to JSON.
+///
+/// See <https://htmx.org/headers/hx-trigger/> for more information.
 #[derive(Debug, Clone)]
 pub struct HxResponseTrigger(pub Vec<String>);
 
@@ -227,10 +235,14 @@ impl IntoResponseParts for HxResponseTrigger {
 
 /// The `HX-Trigger-After-Settle` header.
 ///
-/// Allows you to trigger client-side events after the settle step.
+/// Allows you to trigger client-side events after the settle step. This only
+/// accepts events without data attached. If you intend to add data to the
+/// event, you must enable the `serde` feature flag.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
-/// visible ASCII (32-127) when serializing to json.
+/// visible ASCII (32-127) when serializing to JSON.
+///
+/// See <https://htmx.org/headers/hx-trigger/> for more information.
 #[derive(Debug, Clone)]
 pub struct HxResponseTriggerAfterSettle(pub Vec<String>);
 
@@ -254,10 +266,14 @@ impl IntoResponseParts for HxResponseTriggerAfterSettle {
 
 /// The `HX-Trigger-After-Swap` header.
 ///
-/// Allows you to trigger client-side events after the swap step.
+/// Allows you to trigger client-side events after the swap step. This only
+/// accepts events without data attached. If you intend to add data to the
+/// event, you must enable the `serde` feature flag.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
-/// visible ASCII (32-127) when serializing to json.
+/// visible ASCII (32-127) when serializing to JSON.
+///
+/// See <https://htmx.org/headers/hx-trigger/> for more information.
 #[derive(Debug, Clone)]
 pub struct HxResponseTriggerAfterSwap(pub Vec<String>);
 

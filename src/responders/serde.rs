@@ -88,7 +88,9 @@ impl IntoResponseParts for HxLocation {
 /// Allows you to trigger client-side events.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
-/// visible ASCII (32-127) when serializing to json.
+/// visible ASCII (32-127) when serializing to JSON.
+///
+/// See <https://htmx.org/headers/hx-trigger/> for more information.
 #[derive(Debug, Clone)]
 pub struct HxTrigger(pub Vec<HxEvent>);
 
@@ -108,7 +110,9 @@ impl IntoResponseParts for HxTrigger {
 /// Allows you to trigger client-side events after the settle step.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
-/// visible ASCII (32-127) when serializing to json.
+/// visible ASCII (32-127) when serializing to JSON.
+///
+/// See <https://htmx.org/headers/hx-trigger/> for more information.
 #[derive(Debug, Clone)]
 pub struct HxTriggerAfterSettle(Vec<HxEvent>);
 
@@ -130,7 +134,9 @@ impl IntoResponseParts for HxTriggerAfterSettle {
 /// Allows you to trigger client-side events after the swap step.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
-/// visible ASCII (32-127) when serializing to json.
+/// visible ASCII (32-127) when serializing to JSON.
+///
+/// See <https://htmx.org/headers/hx-trigger/> for more information.
 #[derive(Debug, Clone)]
 pub struct HxTriggerAfterSwap(Vec<HxEvent>);
 
@@ -157,6 +163,7 @@ impl HxEvent {
     pub fn new<T: Serialize>(name: String) -> Self {
         Self { name, data: None }
     }
+
     pub fn new_with_data<T: Serialize>(name: String, data: T) -> Result<Self, serde_json::Error> {
         let data = serde_json::to_value(data)?;
 
