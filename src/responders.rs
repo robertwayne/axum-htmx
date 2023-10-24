@@ -218,6 +218,12 @@ impl IntoResponseParts for HxReselect {
 #[derive(Debug, Clone)]
 pub struct HxResponseTrigger(pub Vec<String>);
 
+impl HxResponseTrigger {
+    pub fn new(events: &[&str]) -> Self {
+        Self(events.iter().map(|e| e.to_string()).collect())
+    }
+}
+
 impl IntoResponseParts for HxResponseTrigger {
     type Error = HxError;
 

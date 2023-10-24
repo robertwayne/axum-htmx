@@ -21,7 +21,7 @@ use crate::{
 /// This response header can be used to trigger a client side redirection
 /// without reloading the whole page. If you only intend to redirect to the
 /// `document.body`, as opposed to a specific target, you can use
-/// `axum_htmx::responders::HxResponseLocation` instead.
+/// `axum_htmx::HxResponseLocation` instead.
 ///
 /// Will fail if the supplied data contains or produces characters that are not
 /// visible ASCII (32-127) when serializing to JSON.
@@ -88,7 +88,7 @@ impl IntoResponseParts for HxLocation {
 /// The `HX-Trigger` header.
 ///
 /// Allows you to trigger client-side events. If you only need to send bare
-/// events, you can use `axum_htmx::responders::HxResponseTrigger` instead.
+/// events, you can use `axum_htmx::HxResponseTrigger` instead.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
 /// visible ASCII (32-127) when serializing to JSON.
@@ -112,7 +112,7 @@ impl IntoResponseParts for HxResponseTrigger {
 ///
 /// Allows you to trigger client-side events after the settle step. If you only
 /// intend to send bare events, you can use
-/// `axum_htmx::responders::HxResponseTriggerAfterSettle` instead.
+/// `axum_htmx::HxResponseTriggerAfterSettle` instead.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
 /// visible ASCII (32-127) when serializing to JSON.
@@ -138,7 +138,7 @@ impl IntoResponseParts for HxResponseTriggerAfterSettle {
 ///
 /// Allows you to trigger client-side events after the swap step. If you only
 /// need to send bare events, you can use
-/// `axum_htmx::responders::HxResponseTriggerAfterSwao` instead.
+/// `axum_htmx::HxResponseTriggerAfterSwao` instead.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
 /// visible ASCII (32-127) when serializing to JSON.
