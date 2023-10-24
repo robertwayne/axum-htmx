@@ -161,14 +161,17 @@ pub struct HxEvent {
 
 impl HxEvent {
     pub fn new<T: Serialize>(name: String) -> Self {
-        Self { name, data: None }
+        Self {
+            name: name.to_string(),
+            data: None,
+        }
     }
 
-    pub fn new_with_data<T: Serialize>(name: String, data: T) -> Result<Self, serde_json::Error> {
+    pub fn new_with_data<T: Serialize>(name: &str, data: T) -> Result<Self, serde_json::Error> {
         let data = serde_json::to_value(data)?;
 
         Ok(Self {
-            name,
+            name: name.to_string(),
             data: Some(data),
         })
     }
