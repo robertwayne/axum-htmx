@@ -160,6 +160,7 @@ impl IntoResponseParts for HxResponseTriggerAfterSwap {
     }
 }
 
+/// Represents a client-side event carrying optional data.
 #[derive(Debug, Clone, Serialize)]
 pub struct HxEvent {
     pub name: String,
