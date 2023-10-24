@@ -12,8 +12,8 @@
 <br>
 <!-- markdownlint-enable -->
 
-`axum-htmx` is a small extension library providing extractors and request guards
- for the various [htmx](https://htmx.org/) headers within
+`axum-htmx` is a small extension library providing extractors, responders, and
+ request guards for all [htmx](https://htmx.org/) headers within
  [axum](https://github.com/tokio-rs/axum). Additionally, the library exports
  const values for all of the htmx headers, so there's no need to mess with
  strings in your handlers.
@@ -49,6 +49,27 @@ type.
 | `HX-Target`                  | `HxTarget`                | `Option<String>` |
 | `HX-Trigger-Name`            | `HxTriggerName`           | `Option<String>` |
 | `HX-Trigger`                 | `HxTrigger`               | `Option<String>` |
+
+## Responders
+
+All of the [htmx response headers](https://htmx.org/reference/#response_headers)
+have a supported responder. A responder is a simple type that implements
+`IntoResponse`, allowing you to simply and safely apply the HX-* headers to any
+of your responses.
+
+| Header           | Responder      | Value                               |
+|------------------|----------------|-------------------------------------|
+| `HX-Location`    | `HxLocation`   | `axum::http::Uri`                   |
+| `HX-Push-Url`    | `HxPushUrl`    | `axum::http::Uri`                   |
+| `HX-Redirect`    | `HxRedirect`   | `axum::http::Uri`                   |
+| `HX-Refresh`     | `HxRefresh`    | `bool`                              |
+| `HX-Replace-Url` | `HxReplaceUrl` | `axum::http::Uri`                   |
+| `HX-Reswap`      | `HxReswap`     | `axum_htmx::responders::SwapOption` |
+| `HX-Retarget`    | `HxRetarget`   | `String                   |
+| `HX-Reselect`    | `HxReselect`   | `String`                            |
+| `HX-Trigger`    | `HxResponseTrigger`    | `String` or `axum_htmx::serde::HxEvent`|
+| `HX-Trigger-After-Settle`   | `HxResponseTriggerAfterSettle`    | `String` or `axum_htmx::serde::HxEvent`|
+| `HX-Trigger-After-Swap`  | `HxResponseTriggerAfterSwap`    | `String` or `axum_htmx::serde::HxEvent`|
 
 ## Request Guards
 
@@ -93,6 +114,20 @@ async fn get_index(HxBoosted(boosted): HxBoosted) -> impl IntoResponse {
 }
 ```
 
+## Example: Responders
+
+```rust
+use axum_htmx::HxResponseTrigger;
+
+// When we load our page, we will trigger any event listeners for "my-event.
+async fn index() -> (&'static str, HxResponseTrigger) {
+    (
+        "Hello, world!",
+        HxResponseTrigger(vec!["my-event".to_string()]),
+    )
+}
+```
+
 ### Example: Router Guard
 
 ```rust
@@ -114,9 +149,10 @@ fn router_two() -> Router {
 ### Feature Flags
 
 <!-- markdownlint-disable -->
-| Flag     | Default  | Description                | Dependencies                                |
-|----------|----------|----------------------------|---------------------------------------------|
-| `guards` | Disabled | Adds request guard layers. | `tower`, `futures-core`, `pin-project-lite` |
+| Flag     | Default  | Description                              | Dependencies                                |
+|----------|----------|------------------------------------------|---------------------------------------------|
+| `guards` | Disabled | Adds request guard layers.               | `tower`, `futures-core`, `pin-project-lite` |
+| `serde`  | Disabled | Adds serde support for response headers. | `serde`, `serde_json`                       |
 <!-- markdownlint-enable -->
 
 ## Contributing
