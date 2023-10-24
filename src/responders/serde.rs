@@ -234,3 +234,28 @@ impl serde::Serialize for SwapOption {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use super::*;
+
+    #[test]
+    fn valid_event_to_header_encoding() {
+        let evt = HxEvent::new_with_data(
+            "my-event",
+            json!({"level": "info", "message": {
+                "body": "This is a test message.",
+                "title": "Hello, world!",
+            }}),
+        )
+        .unwrap();
+
+        let header_value = events_to_header_value(vec![evt]).unwrap();
+
+        let expected_value = r#"{"my-event":{"level":"info","message":{"body":"This is a test message.","title":"Hello, world!"}}}"#;
+
+        assert_eq!(header_value, HeaderValue::from_static(expected_value));
+    }
+}
