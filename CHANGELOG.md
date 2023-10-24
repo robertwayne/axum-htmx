@@ -5,8 +5,9 @@
 - Added support for all [htmx response
 headers](https://htmx.org/reference/#response_headers) via a type implemention
 `IntoResponseParts`. These "responders" allow you to simply and safely apply the
-HX-* headers to any of your responses. Thanks to @pfz4 for the implementation
-work! (#5)
+HX-* headers to any of your responses. Thanks to
+[@pfz4](https://github.com/pfz4) for the implementation work!
+([#5](https://github.com/robertwayne/axum-htmx/pull/5))
 
 ## v0.3.1
 
