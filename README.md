@@ -57,19 +57,19 @@ have a supported responder. A responder is a basic type that implements
 `IntoResponseParts`, allowing you to simply and safely apply the HX-* headers to
 any of your responses.
 
-| Header           | Responder      | Value                               |
-|------------------|----------------|-------------------------------------|
-| `HX-Location`    | `HxLocation`   | `axum::http::Uri`                   |
-| `HX-Push-Url`    | `HxPushUrl`    | `axum::http::Uri`                   |
-| `HX-Redirect`    | `HxRedirect`   | `axum::http::Uri`                   |
-| `HX-Refresh`     | `HxRefresh`    | `bool`                              |
-| `HX-Replace-Url` | `HxReplaceUrl` | `axum::http::Uri`                   |
-| `HX-Reswap`      | `HxReswap`     | `axum_htmx::responders::SwapOption` |
-| `HX-Retarget`    | `HxRetarget`   | `String``                   |
-| `HX-Reselect`    | `HxReselect`   | `String`                            |
-| `HX-Trigger`    | `HxResponseTrigger`    | `String` or `axum_htmx::serde::HxEvent`*|
-| `HX-Trigger-After-Settle`   | `HxResponseTriggerAfterSettle`    | `String` or `axum_htmx::serde::HxEvent`*|
-| `HX-Trigger-After-Swap`  | `HxResponseTriggerAfterSwap`    | `String` or `axum_htmx::serde::HxEvent`*|
+| Header                    | Responder                      | Value                                    |
+|---------------------------|--------------------------------|------------------------------------------|
+| `HX-Location`             | `HxLocation`                   | `axum::http::Uri`                        |
+| `HX-Push-Url`             | `HxPushUrl`                    | `axum::http::Uri`                        |
+| `HX-Redirect`             | `HxRedirect`                   | `axum::http::Uri`                        |
+| `HX-Refresh`              | `HxRefresh`                    | `bool`                                   |
+| `HX-Replace-Url`          | `HxReplaceUrl`                 | `axum::http::Uri`                        |
+| `HX-Reswap`               | `HxReswap`                     | `axum_htmx::responders::SwapOption`      |
+| `HX-Retarget`             | `HxRetarget`                   | `String`                                 |
+| `HX-Reselect`             | `HxReselect`                   | `String`                                 |
+| `HX-Trigger`              | `HxResponseTrigger`            | `String` or `axum_htmx::serde::HxEvent`* |
+| `HX-Trigger-After-Settle` | `HxResponseTriggerAfterSettle` | `String` or `axum_htmx::serde::HxEvent`* |
+| `HX-Trigger-After-Swap`   | `HxResponseTriggerAfterSwap`   | `String` or `axum_htmx::serde::HxEvent`* |
 
 _* requires the `serde` feature flag to be enabled._
 
