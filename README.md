@@ -53,7 +53,7 @@ type.
 ## Responders
 
 All of the [htmx response headers](https://htmx.org/reference/#response_headers)
-have a supported responder. A responder is a simple type that implements
+have a supported responder. A responder is a basic type that implements
 `IntoResponseParts`, allowing you to simply and safely apply the HX-* headers to
 any of your responses.
 
