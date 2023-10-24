@@ -1,4 +1,4 @@
-//! Axum extractors for htmx headers.
+//! Axum extractors for htmx request headers.
 
 use axum::{extract::FromRequestParts, http::request::Parts};
 

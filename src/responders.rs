@@ -1,3 +1,5 @@
+//! Axum responses for htmx response headers.
+
 use std::convert::Infallible;
 
 use axum::{
