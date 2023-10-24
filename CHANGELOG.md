@@ -3,7 +3,7 @@
 ## v0.4.0
 
 - Added support for all [htmx response
-headers](https://htmx.org/reference/#response_headers) via a type implemention
+headers](https://htmx.org/reference/#response_headers) via a type implementing
 `IntoResponseParts`. These "responders" allow you to simply and safely apply the
 HX-* headers to any of your responses. Thanks to
 [@pfz4](https://github.com/pfz4) for the implementation work!
