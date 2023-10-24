@@ -18,6 +18,22 @@
  const values for all of the htmx headers, so there's no need to mess with
  strings in your handlers.
 
+## Table of Contents
+
+- [axum-htmx](#axum-htmx)
+  - [Table of Contents](#table-of-contents)
+  - [Getting Started](#getting-started)
+  - [Extractors](#extractors)
+  - [Responders](#responders)
+  - [Request Guards](#request-guards)
+  - [Examples](#examples)
+    - [Example: Extractors](#example-extractors)
+    - [Example: Responders](#example-responders)
+    - [Example: Router Guard](#example-router-guard)
+  - [Feature Flags](#feature-flags)
+  - [Contributing](#contributing)
+  - [License](#license)
+
 ## Getting Started
 
 Simply run `cargo add axum-htmx` to add the library to your project.
@@ -85,6 +101,8 @@ _It should be noted that this is NOT a replacement for an auth guard. A user can
 trivially set the `HX-Request` header themselves. This is merely a convenience
 for preventing users from receiving partial responses without context. If you
 need to secure an endpoint you should be using a proper auth system._
+
+## Examples
 
 ### Example: Extractors
 
@@ -175,7 +193,7 @@ fn router_two() -> Router {
 }
 ```
 
-### Feature Flags
+## Feature Flags
 
 <!-- markdownlint-disable -->
 | Flag     | Default  | Description                                                                        | Dependencies                                |
