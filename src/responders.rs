@@ -104,9 +104,10 @@ impl IntoResponseParts for HxRefresh {
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
         res.headers_mut().insert(
             headers::HX_REFRESH,
-            match self.0 {
-                true => HeaderValue::from_static("true"),
-                false => HeaderValue::from_static("false"),
+            if self.0 {
+                HeaderValue::from_static("true")
+            } else {
+                HeaderValue::from_static("false")
             },
         );
 
