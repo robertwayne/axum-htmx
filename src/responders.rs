@@ -220,9 +220,13 @@ impl IntoResponseParts for HxReselect {
 #[derive(Debug, Clone)]
 pub struct HxResponseTrigger(pub Vec<String>);
 
-impl HxResponseTrigger {
-    pub fn new(events: &[&str]) -> Self {
-        Self(events.iter().map(|e| e.to_string()).collect())
+impl<T> From<T> for HxResponseTrigger
+where
+    T: IntoIterator,
+    T::Item: ToString,
+{
+    fn from(value: T) -> Self {
+        Self(value.into_iter().map(|s| s.to_string()).collect())
     }
 }
 
@@ -258,6 +262,16 @@ impl IntoResponseParts for HxResponseTrigger {
 #[derive(Debug, Clone)]
 pub struct HxResponseTriggerAfterSettle(pub Vec<String>);
 
+impl<T> From<T> for HxResponseTriggerAfterSettle
+where
+    T: IntoIterator,
+    T::Item: ToString,
+{
+    fn from(value: T) -> Self {
+        Self(value.into_iter().map(|s| s.to_string()).collect())
+    }
+}
+
 impl IntoResponseParts for HxResponseTriggerAfterSettle {
     type Error = HxError;
 
@@ -288,6 +302,16 @@ impl IntoResponseParts for HxResponseTriggerAfterSettle {
 /// See <https://htmx.org/headers/hx-trigger/> for more information.
 #[derive(Debug, Clone)]
 pub struct HxResponseTriggerAfterSwap(pub Vec<String>);
+
+impl<T> From<T> for HxResponseTriggerAfterSwap
+where
+    T: IntoIterator,
+    T::Item: ToString,
+{
+    fn from(value: T) -> Self {
+        Self(value.into_iter().map(|s| s.to_string()).collect())
+    }
+}
 
 impl IntoResponseParts for HxResponseTriggerAfterSwap {
     type Error = HxError;
