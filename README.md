@@ -65,11 +65,13 @@ any of your responses.
 | `HX-Refresh`     | `HxRefresh`    | `bool`                              |
 | `HX-Replace-Url` | `HxReplaceUrl` | `axum::http::Uri`                   |
 | `HX-Reswap`      | `HxReswap`     | `axum_htmx::responders::SwapOption` |
-| `HX-Retarget`    | `HxRetarget`   | `String                   |
+| `HX-Retarget`    | `HxRetarget`   | `String``                   |
 | `HX-Reselect`    | `HxReselect`   | `String`                            |
-| `HX-Trigger`    | `HxResponseTrigger`    | `String` or `axum_htmx::serde::HxEvent`|
-| `HX-Trigger-After-Settle`   | `HxResponseTriggerAfterSettle`    | `String` or `axum_htmx::serde::HxEvent`|
-| `HX-Trigger-After-Swap`  | `HxResponseTriggerAfterSwap`    | `String` or `axum_htmx::serde::HxEvent`|
+| `HX-Trigger`    | `HxResponseTrigger`    | `String` or `axum_htmx::serde::HxEvent`*|
+| `HX-Trigger-After-Settle`   | `HxResponseTriggerAfterSettle`    | `String` or `axum_htmx::serde::HxEvent`*|
+| `HX-Trigger-After-Swap`  | `HxResponseTriggerAfterSwap`    | `String` or `axum_htmx::serde::HxEvent`*|
+
+_* requires the `serde` feature flag to be enabled._
 
 ## Request Guards
 
