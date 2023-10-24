@@ -84,7 +84,7 @@ trivially set the `HX-Request` header themselves. This is merely a convenience
 for preventing users from receiving partial responses without context. If you
 need to secure an endpoint you should be using a proper auth system._
 
-## Example: Extractors
+### Example: Extractors
 
 In this example, we'll look for the `HX-Boosted` header, which is set when
 applying the [hx-boost](https://htmx.org/attributes/hx-boost/) attribute to an
@@ -114,7 +114,7 @@ async fn get_index(HxBoosted(boosted): HxBoosted) -> impl IntoResponse {
 }
 ```
 
-## Example: Responders
+### Example: Responders
 
 ```rust
 use axum_htmx::HxResponseTrigger;
