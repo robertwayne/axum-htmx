@@ -157,9 +157,6 @@ async fn index() -> (&'static str, HxResponseTrigger) {
 }
 ```
 
-```rust
-```
-
 ### Example: Router Guard
 
 ```rust
