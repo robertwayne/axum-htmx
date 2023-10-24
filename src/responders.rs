@@ -21,9 +21,13 @@ const HX_SWAP_NONE: &str = "none";
 
 /// The `HX-Location` header.
 ///
-/// This response header can be used to trigger a client side redirection without reloading the whole page.
+/// This response header can be used to trigger a client side redirection
+/// without reloading the whole page.
 ///
-/// Will fail if the supplied Uri contains characters that are not visible ASCII (32-127).
+/// Will fail if the supplied Uri contains characters that are not visible ASCII
+/// (32-127).
+///
+/// See <https://htmx.org/headers/hx-location/> for more information.
 #[derive(Debug, Clone)]
 pub struct HxLocation(pub Uri);
 
@@ -35,6 +39,7 @@ impl IntoResponseParts for HxLocation {
             headers::HX_LOCATION,
             HeaderValue::from_maybe_shared(self.0.to_string())?,
         );
+
         Ok(res)
     }
 }
@@ -43,7 +48,8 @@ impl IntoResponseParts for HxLocation {
 ///
 /// Pushes a new url into the history stack.
 ///
-/// Will fail if the supplied Uri contains characters that are not visible ASCII (32-127).
+/// Will fail if the supplied Uri contains characters that are not visible ASCII
+/// (32-127).
 #[derive(Debug, Clone)]
 pub struct HxPushUrl(pub Uri);
 
@@ -55,6 +61,7 @@ impl IntoResponseParts for HxPushUrl {
             headers::HX_PUSH_URL,
             HeaderValue::from_maybe_shared(self.0.to_string())?,
         );
+
         Ok(res)
     }
 }
@@ -63,7 +70,8 @@ impl IntoResponseParts for HxPushUrl {
 ///
 /// Can be used to do a client-side redirect to a new location.
 ///
-/// Will fail if the supplied Uri contains characters that are not visible ASCII (32-127).
+/// Will fail if the supplied Uri contains characters that are not visible ASCII
+/// (32-127).
 #[derive(Debug, Clone)]
 pub struct HxRedirect(pub Uri);
 
@@ -75,6 +83,7 @@ impl IntoResponseParts for HxRedirect {
             headers::HX_REDIRECT,
             HeaderValue::from_maybe_shared(self.0.to_string())?,
         );
+
         Ok(res)
     }
 }
@@ -98,6 +107,7 @@ impl IntoResponseParts for HxRefresh {
                 false => HeaderValue::from_static("false"),
             },
         );
+
         Ok(res)
     }
 }
@@ -106,7 +116,8 @@ impl IntoResponseParts for HxRefresh {
 ///
 /// Replaces the currelt URL in the location bar.
 ///
-/// Will fail if the supplied Uri contains characters that are not visible ASCII (32-127).
+/// Will fail if the supplied Uri contains characters that are not visible ASCII
+/// (32-127).
 #[derive(Debug, Clone)]
 pub struct HxReplaceUrl(pub Uri);
 
@@ -118,6 +129,7 @@ impl IntoResponseParts for HxReplaceUrl {
             headers::HX_REPLACE_URL,
             HeaderValue::from_maybe_shared(self.0.to_string())?,
         );
+
         Ok(res)
     }
 }
@@ -135,15 +147,18 @@ impl IntoResponseParts for HxReswap {
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
         res.headers_mut().insert(headers::HX_RESWAP, self.0.into());
+
         Ok(res)
     }
 }
 
 /// The `HX-Retarget` header.
 ///
-/// A CSS selector that updates the target of the content update to a different element on the page.
+/// A CSS selector that updates the target of the content update to a different
+/// element on the page.
 ///
-/// Will fail if the supplied String contains characters that are not visible ASCII (32-127).
+/// Will fail if the supplied String contains characters that are not visible
+/// ASCII (32-127).
 #[derive(Debug, Clone)]
 pub struct HxRetarget(pub String);
 
@@ -155,15 +170,18 @@ impl IntoResponseParts for HxRetarget {
             headers::HX_RETARGET,
             HeaderValue::from_maybe_shared(self.0)?,
         );
+
         Ok(res)
     }
 }
 
 /// The `HX-Reselect` header.
 ///
-/// A CSS selector that allows you to choose which part of the response is used to be swapped in. Overrides an existing hx-select on the triggering element.
+/// A CSS selector that allows you to choose which part of the response is used
+/// to be swapped in. Overrides an existing hx-select on the triggering element.
 ///
-/// Will fail if the supplied String contains characters that are not visible ASCII (32-127).
+/// Will fail if the supplied String contains characters that are not visible
+/// ASCII (32-127).
 #[derive(Debug, Clone)]
 pub struct HxReselect(pub String);
 
@@ -175,6 +193,7 @@ impl IntoResponseParts for HxReselect {
             headers::HX_RESELECT,
             HeaderValue::from_maybe_shared(self.0)?,
         );
+
         Ok(res)
     }
 }
@@ -183,7 +202,8 @@ impl IntoResponseParts for HxReselect {
 ///
 /// Allows you to trigger client-side events.
 ///
-/// Will fail if the supplied events contain or produce characters that are not visible ASCII (32-127) when serializing to json.
+/// Will fail if the supplied events contain or produce characters that are not
+/// visible ASCII (32-127) when serializing to json.
 #[derive(Debug, Clone)]
 pub struct HxResponseTrigger(pub Vec<String>);
 
@@ -200,6 +220,7 @@ impl IntoResponseParts for HxResponseTrigger {
                     .unwrap_or_default(),
             )?,
         );
+
         Ok(res)
     }
 }
@@ -208,7 +229,8 @@ impl IntoResponseParts for HxResponseTrigger {
 ///
 /// Allows you to trigger client-side events after the settle step.
 ///
-/// Will fail if the supplied events contain or produce characters that are not visible ASCII (32-127) when serializing to json.
+/// Will fail if the supplied events contain or produce characters that are not
+/// visible ASCII (32-127) when serializing to json.
 #[derive(Debug, Clone)]
 pub struct HxResponseTriggerAfterSettle(pub Vec<String>);
 
@@ -225,6 +247,7 @@ impl IntoResponseParts for HxResponseTriggerAfterSettle {
                     .unwrap_or_default(),
             )?,
         );
+
         Ok(res)
     }
 }
@@ -233,7 +256,8 @@ impl IntoResponseParts for HxResponseTriggerAfterSettle {
 ///
 /// Allows you to trigger client-side events after the swap step.
 ///
-/// Will fail if the supplied events contain or produce characters that are not visible ASCII (32-127) when serializing to json.
+/// Will fail if the supplied events contain or produce characters that are not
+/// visible ASCII (32-127) when serializing to json.
 #[derive(Debug, Clone)]
 pub struct HxResponseTriggerAfterSwap(pub Vec<String>);
 
@@ -250,6 +274,7 @@ impl IntoResponseParts for HxResponseTriggerAfterSwap {
                     .unwrap_or_default(),
             )?,
         );
+
         Ok(res)
     }
 }
@@ -272,7 +297,8 @@ pub enum SwapOption {
     AfterEnd,
     /// Deletes the target element regardless of the response
     Delete,
-    /// Does not append content from response (out of band items will still be processed).
+    /// Does not append content from response (out of band items will still be
+    /// processed).
     None,
 }
 
