@@ -345,6 +345,7 @@ impl From<SwapOption> for HeaderValue {
     }
 }
 
+#[derive(Debug)]
 pub enum HxError {
     InvalidHeaderValue(InvalidHeaderValue),
 
