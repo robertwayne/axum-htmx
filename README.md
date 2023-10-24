@@ -54,8 +54,8 @@ type.
 
 All of the [htmx response headers](https://htmx.org/reference/#response_headers)
 have a supported responder. A responder is a simple type that implements
-`IntoResponse`, allowing you to simply and safely apply the HX-* headers to any
-of your responses.
+`IntoResponseParts`, allowing you to simply and safely apply the HX-* headers to
+any of your responses.
 
 | Header           | Responder      | Value                               |
 |------------------|----------------|-------------------------------------|
