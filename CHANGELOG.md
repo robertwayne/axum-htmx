@@ -1,5 +1,6 @@
 # Changelog
 
+<<<<<<< HEAD
 ## v0.4.0
 
 - Added support for all [htmx response
@@ -14,6 +15,14 @@ HX-* headers to any of your responses. Thanks to
 - Rebuild docs with features enabled so `HxRequestGuardLayer` is visible on
   docs.rs.
 
+||||||| 070fb06
+=======
+## v0.3.1
+
+- Rebuild docs with features enabled so `HxRequestGuardLayer` is visible on
+  docs.rs.
+
+>>>>>>> 4a6d6f705ce9a5384eb1a9feb10940eee19a4726
 ## v0.3.0
 
 - `HxRequestGuardLayer` now redirects on failures instead of returning a 403. By
