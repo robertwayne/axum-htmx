@@ -193,8 +193,9 @@ pub(crate) fn events_to_header_value(events: Vec<HxEvent>) -> Result<HeaderValue
         // encoded.
         let header_value = events
             .into_iter()
-            .map(|e| (e.name, e.data.map(|d| d.to_string()).unwrap_or_default()))
-            .collect::<HashMap<_, _>>();
+            .map(|e| (e.name, e.data.unwrap_or_default()))
+            .collect::<HashMap<String, Value>>();
+
         serde_json::to_string(&header_value)?
     } else {
         // no event contains data, the event names can be put in the header
