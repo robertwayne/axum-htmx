@@ -1,4 +1,3 @@
-#![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 #![doc = include_str!("../README.md")]
 #![forbid(unsafe_code)]
 pub mod extractors;

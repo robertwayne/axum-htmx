@@ -57,7 +57,8 @@ pub const HX_RESELECT: &str = "HX-Reselect";
 
 /// Can be set as a request or response header.
 ///
-/// In a request, it contains the `id of the element that triggered the request.
+/// In a request, it contains the `id` of the element that triggered the
+/// request.
 ///
 /// In a response, it can be used to trigger client-side events.
 ///
