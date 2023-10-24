@@ -149,10 +149,10 @@ fn router_two() -> Router {
 ### Feature Flags
 
 <!-- markdownlint-disable -->
-| Flag     | Default  | Description                              | Dependencies                                |
-|----------|----------|------------------------------------------|---------------------------------------------|
-| `guards` | Disabled | Adds request guard layers.               | `tower`, `futures-core`, `pin-project-lite` |
-| `serde`  | Disabled | Adds serde support for response headers. | `serde`, `serde_json`                       |
+| Flag     | Default  | Description                                                                        | Dependencies                                |
+|----------|----------|------------------------------------------------------------------------------------|---------------------------------------------|
+| `guards` | Disabled | Adds request guard layers.                                                         | `tower`, `futures-core`, `pin-project-lite` |
+| `serde`  | Disabled | Adds serde support for the `HxResponseTrigger*` and `HxLocation` response headers. | `serde`, `serde_json`                       |
 <!-- markdownlint-enable -->
 
 ## Contributing
