@@ -4,8 +4,10 @@ pub mod extractors;
 #[cfg(feature = "guards")]
 pub mod guard;
 pub mod headers;
+pub mod responders;
 
 pub use extractors::*;
 #[cfg(feature = "guards")]
 pub use guard::*;
 pub use headers::*;
+pub use responders::*;
