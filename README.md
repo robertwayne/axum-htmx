@@ -118,6 +118,9 @@ async fn get_index(HxBoosted(boosted): HxBoosted) -> impl IntoResponse {
 
 ### Example: Responders
 
+We can trigger any event being listened to by the DOM using an [htmx
+trigger](https://htmx.org/attributes/hx-trigger/) header.
+
 ```rust
 use axum_htmx::HxResponseTrigger;
 
@@ -128,6 +131,33 @@ async fn index() -> (&'static str, HxResponseTrigger) {
         HxResponseTrigger(vec!["my-event".to_string()]),
     )
 }
+```
+
+...`htmx` even allow arbitrary data to be sent along with the event, which we
+can use via the `serde` feature flag and the `HxEvent` type.
+
+```rust
+use axum_htmx::HxEvent;
+
+// Note that we are using `HxResponseTrigger` from the `axum_htmx::serde` module
+// instead of the root module.
+use axum_htmx::serde::HxResponseTrigger;
+
+async fn index() -> (&'static str, HxResponseTrigger) {
+    let event = HxEvent::new_with_data(
+        "my-event",
+        json!({"level": "info", "message": {
+            "title": "Hello, world!",
+            "body": "This is a test message.",
+        }}),
+    )
+    .unwrap();
+
+    ("Hello, world!", HxResponseTrigger(event))
+}
+```
+
+```rust
 ```
 
 ### Example: Router Guard
