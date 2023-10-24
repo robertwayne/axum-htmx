@@ -22,7 +22,9 @@ const HX_SWAP_NONE: &str = "none";
 /// The `HX-Location` header.
 ///
 /// This response header can be used to trigger a client side redirection
-/// without reloading the whole page.
+/// without reloading the whole page. If you intend to redirect to a specific
+/// target on the page, you must enable the `serde` feature flag and use
+/// `axum_htmx::responders::serde::HxLocation` instead.
 ///
 /// Will fail if the supplied Uri contains characters that are not visible ASCII
 /// (32-127).
@@ -205,9 +207,9 @@ impl IntoResponseParts for HxReselect {
 
 /// The `HX-Trigger` header.
 ///
-/// Allows you to trigger client-side events. This only accepts events without
-/// data attached. If you intend to add data to the event, you must enable the
-/// `serde` feature flag.
+/// Allows you to trigger client-side events. If you intend to add data to your
+/// events, you must enable the `serde` feature flag and use
+/// `axum_htmx::responders::serde::HxResponseTrigger` instead.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
 /// visible ASCII (32-127) when serializing to JSON.
@@ -236,9 +238,10 @@ impl IntoResponseParts for HxResponseTrigger {
 
 /// The `HX-Trigger-After-Settle` header.
 ///
-/// Allows you to trigger client-side events after the settle step. This only
-/// accepts events without data attached. If you intend to add data to the
-/// event, you must enable the `serde` feature flag.
+/// Allows you to trigger client-side events after the settle step. If you
+/// intend to add data to your events, you must enable the `serde` feature flag
+/// and use `axum_htmx::responders::serde::HxResponseTriggerAfterSettle`
+/// instead.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
 /// visible ASCII (32-127) when serializing to JSON.
@@ -267,9 +270,9 @@ impl IntoResponseParts for HxResponseTriggerAfterSettle {
 
 /// The `HX-Trigger-After-Swap` header.
 ///
-/// Allows you to trigger client-side events after the swap step. This only
-/// accepts events without data attached. If you intend to add data to the
-/// event, you must enable the `serde` feature flag.
+/// Allows you to trigger client-side events after the swap step. If you intend
+/// to add data to your events, you must enable the `serde` feature flag and use
+/// `axum_htmx::responders::serde::HxResponseTriggerAfterSwap` instead.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
 /// visible ASCII (32-127) when serializing to JSON.

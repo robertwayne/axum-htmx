@@ -19,7 +19,9 @@ use crate::{
 /// The `HX-Location` header.
 ///
 /// This response header can be used to trigger a client side redirection
-/// without reloading the whole page.
+/// without reloading the whole page. If you only intend to redirect to the
+/// `document.body`, as opposed to a specific target, you can use
+/// `axum_htmx::responders::HxResponseLocation` instead.
 ///
 /// Will fail if the supplied data contains or produces characters that are not
 /// visible ASCII (32-127) when serializing to JSON.
@@ -85,16 +87,17 @@ impl IntoResponseParts for HxLocation {
 
 /// The `HX-Trigger` header.
 ///
-/// Allows you to trigger client-side events.
+/// Allows you to trigger client-side events. If you only need to send bare
+/// events, you can use `axum_htmx::responders::HxResponseTrigger` instead.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
 /// visible ASCII (32-127) when serializing to JSON.
 ///
 /// See <https://htmx.org/headers/hx-trigger/> for more information.
 #[derive(Debug, Clone)]
-pub struct HxTrigger(pub Vec<HxEvent>);
+pub struct HxResponseTrigger(pub Vec<HxEvent>);
 
-impl IntoResponseParts for HxTrigger {
+impl IntoResponseParts for HxResponseTrigger {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
@@ -107,16 +110,18 @@ impl IntoResponseParts for HxTrigger {
 
 /// The `HX-Trigger-After-Settle` header.
 ///
-/// Allows you to trigger client-side events after the settle step.
+/// Allows you to trigger client-side events after the settle step. If you only
+/// intend to send bare events, you can use
+/// `axum_htmx::responders::HxResponseTriggerAfterSettle` instead.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
 /// visible ASCII (32-127) when serializing to JSON.
 ///
 /// See <https://htmx.org/headers/hx-trigger/> for more information.
 #[derive(Debug, Clone)]
-pub struct HxTriggerAfterSettle(Vec<HxEvent>);
+pub struct HxResponseTriggerAfterSettle(pub Vec<HxEvent>);
 
-impl IntoResponseParts for HxTriggerAfterSettle {
+impl IntoResponseParts for HxResponseTriggerAfterSettle {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
@@ -131,16 +136,18 @@ impl IntoResponseParts for HxTriggerAfterSettle {
 
 /// The `HX-Trigger-After-Swap` header.
 ///
-/// Allows you to trigger client-side events after the swap step.
+/// Allows you to trigger client-side events after the swap step. If you only
+/// need to send bare events, you can use
+/// `axum_htmx::responders::HxResponseTriggerAfterSwao` instead.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
 /// visible ASCII (32-127) when serializing to JSON.
 ///
 /// See <https://htmx.org/headers/hx-trigger/> for more information.
 #[derive(Debug, Clone)]
-pub struct HxTriggerAfterSwap(Vec<HxEvent>);
+pub struct HxResponseTriggerAfterSwap(pub Vec<HxEvent>);
 
-impl IntoResponseParts for HxTriggerAfterSwap {
+impl IntoResponseParts for HxResponseTriggerAfterSwap {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
