@@ -38,15 +38,6 @@
 
 Simply run `cargo add axum-htmx` to add the library to your project.
 
-If you are using the unreleased branch of `axum` from GitHub, you can build
-against the `main` version of `axum-htmx` by adding the following to your
-`Cargo.toml`:
-
-```toml
-[dependencies]
-axum-htmx = { git = "https://github.com/robertwayne/axum-htmx" }
-```
-
 ## Extractors
 
 All of the [htmx request headers](https://htmx.org/reference/#request_headers)
@@ -155,7 +146,8 @@ async fn index() -> (&'static str, HxResponseTrigger) {
 can use via the `serde` feature flag and the `HxEvent` type.
 
 ```rust
-use axum_htmx::HxEvent;
+use axum_htmx::serde::HxEvent;
+use serde_json::json;
 
 // Note that we are using `HxResponseTrigger` from the `axum_htmx::serde` module
 // instead of the root module.
@@ -171,7 +163,7 @@ async fn index() -> (&'static str, HxResponseTrigger) {
     )
     .unwrap();
 
-    ("Hello, world!", HxResponseTrigger(event))
+    ("Hello, world!", HxResponseTrigger(vec![event]))
 }
 ```
 

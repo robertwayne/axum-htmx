@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.5.0
+
+- Add `From` impls for `HxResponseTrigger`, `HxResponseTriggerAfterSettle`, and
+  `HxResponseTriggerAfterSwap`, allowing them to take any iterator where `T:
+  Into<String>`.
+
 ## v0.4.0
 
 - Added support for all [htmx response

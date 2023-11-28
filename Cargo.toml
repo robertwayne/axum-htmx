@@ -16,7 +16,7 @@ guards = ["tower", "futures-core", "pin-project-lite"]
 serde = ["dep:serde", "dep:serde_json"]
 
 [dependencies]
-axum = { git = "https://github.com/tokio-rs/axum", branch = "main", default-features = false }
+axum = { version = "0.7", default-features = false }
 
 # Optional dependencies required for the `guards` feature.
 tower = { version = "0.4", default-features = false, optional = true }
