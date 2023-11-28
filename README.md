@@ -142,7 +142,7 @@ async fn index() -> (&'static str, HxResponseTrigger) {
 }
 ```
 
-...`htmx` even allow arbitrary data to be sent along with the event, which we
+`htmx` also allows arbitrary data to be sent along with the event, which we
 can use via the `serde` feature flag and the `HxEvent` type.
 
 ```rust
