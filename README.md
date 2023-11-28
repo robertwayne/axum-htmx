@@ -155,7 +155,8 @@ async fn index() -> (&'static str, HxResponseTrigger) {
 can use via the `serde` feature flag and the `HxEvent` type.
 
 ```rust
-use axum_htmx::HxEvent;
+use axum_htmx::serde::HxEvent;
+use serde_json::json;
 
 // Note that we are using `HxResponseTrigger` from the `axum_htmx::serde` module
 // instead of the root module.
@@ -171,7 +172,7 @@ async fn index() -> (&'static str, HxResponseTrigger) {
     )
     .unwrap();
 
-    ("Hello, world!", HxResponseTrigger(event))
+    ("Hello, world!", HxResponseTrigger(vec![event]))
 }
 ```
 
