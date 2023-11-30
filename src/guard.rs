@@ -51,6 +51,7 @@ impl<'a, S> Layer<S> for HxRequestGuardLayer<'a> {
     }
 }
 
+/// Tower service that implementes redirecting to non-partial routes.
 #[derive(Debug, Clone)]
 pub struct HxRequestGuard<'a, S> {
     inner: S,
