@@ -5,6 +5,13 @@
 - Add `From` impls for `HxResponseTrigger`, `HxResponseTriggerAfterSettle`, and
   `HxResponseTriggerAfterSwap`, allowing them to take any iterator where `T:
   Into<String>`.
+- Added feature flag badges to docs.rs pages. Thanks to
+  [@ItsEthra](https://github.com/ItsEthra).
+  ([#7](https://github.com/robertwayne/axum-htmx/pull/7))
+- Reduced dependency count / compile time by swapping `axum` out for the
+`axum-core`, `async-trait`, and `http` crates. Thanks to
+  [@ItsEthra](https://github.com/ItsEthra) for their work on this!
+  ([#8](https://github.com/robertwayne/axum-htmx/pull/8))
 
 ## v0.4.0
 
