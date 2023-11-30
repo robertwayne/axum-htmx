@@ -10,6 +10,7 @@ use axum::{
 use crate::headers;
 
 #[cfg(feature = "serde")]
+#[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
 pub mod serde;
 
 const HX_SWAP_INNER_HTML: &str = "innerHTML";
