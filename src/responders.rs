@@ -2,10 +2,8 @@
 
 use std::convert::Infallible;
 
-use axum::{
-    http::{header::InvalidHeaderValue, HeaderValue, StatusCode, Uri},
-    response::{IntoResponse, IntoResponseParts, ResponseParts},
-};
+use axum_core::response::{IntoResponse, IntoResponseParts, ResponseParts};
+use http::{header::InvalidHeaderValue, HeaderValue, StatusCode, Uri};
 
 use crate::headers;
 
@@ -392,7 +390,7 @@ impl From<serde_json::Error> for HxError {
 }
 
 impl IntoResponse for HxError {
-    fn into_response(self) -> axum::response::Response {
+    fn into_response(self) -> axum_core::response::Response {
         match self {
             Self::InvalidHeaderValue(_) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, "invalid header value").into_response()
