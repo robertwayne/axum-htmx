@@ -1,9 +1,7 @@
 use std::collections::HashMap;
 
-use axum::{
-    http::{HeaderValue, Uri},
-    response::{IntoResponseParts, ResponseParts},
-};
+use axum_core::response::{IntoResponseParts, ResponseParts};
+use http::{HeaderValue, Uri};
 use serde::Serialize;
 use serde_json::Value;
 

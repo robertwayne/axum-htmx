@@ -1,6 +1,8 @@
 //! Axum extractors for htmx request headers.
 
-use axum::{extract::FromRequestParts, http::request::Parts};
+use async_trait::async_trait;
+use axum_core::extract::FromRequestParts;
+use http::request::Parts;
 
 use crate::{
     HX_BOOSTED, HX_CURRENT_URL, HX_HISTORY_RESTORE_REQUEST, HX_PROMPT, HX_REQUEST, HX_TARGET,
@@ -19,7 +21,7 @@ use crate::{
 #[derive(Debug, Clone, Copy)]
 pub struct HxBoosted(pub bool);
 
-#[axum::async_trait]
+#[async_trait]
 impl<S> FromRequestParts<S> for HxBoosted
 where
     S: Send + Sync,
@@ -45,7 +47,7 @@ where
 #[derive(Debug, Clone)]
 pub struct HxCurrentUrl(pub Option<String>);
 
-#[axum::async_trait]
+#[async_trait]
 impl<S> FromRequestParts<S> for HxCurrentUrl
 where
     S: Send + Sync,
@@ -70,7 +72,7 @@ where
 #[derive(Debug, Clone, Copy)]
 pub struct HxHistoryRestoreRequest(pub bool);
 
-#[axum::async_trait]
+#[async_trait]
 impl<S> FromRequestParts<S> for HxHistoryRestoreRequest
 where
     S: Send + Sync,
@@ -96,7 +98,7 @@ where
 #[derive(Debug, Clone)]
 pub struct HxPrompt(pub Option<String>);
 
-#[axum::async_trait]
+#[async_trait]
 impl<S> FromRequestParts<S> for HxPrompt
 where
     S: Send + Sync,
@@ -124,7 +126,7 @@ where
 #[derive(Debug, Clone, Copy)]
 pub struct HxRequest(pub bool);
 
-#[axum::async_trait]
+#[async_trait]
 impl<S> FromRequestParts<S> for HxRequest
 where
     S: Send + Sync,
@@ -151,7 +153,7 @@ where
 #[derive(Debug, Clone)]
 pub struct HxTarget(pub Option<String>);
 
-#[axum::async_trait]
+#[async_trait]
 impl<S> FromRequestParts<S> for HxTarget
 where
     S: Send + Sync,
@@ -180,7 +182,7 @@ where
 #[derive(Debug, Clone)]
 pub struct HxTriggerName(pub Option<String>);
 
-#[axum::async_trait]
+#[async_trait]
 impl<S> FromRequestParts<S> for HxTriggerName
 where
     S: Send + Sync,
@@ -209,7 +211,7 @@ where
 #[derive(Debug, Clone)]
 pub struct HxTrigger(pub Option<String>);
 
-#[axum::async_trait]
+#[async_trait]
 impl<S> FromRequestParts<S> for HxTrigger
 where
     S: Send + Sync,

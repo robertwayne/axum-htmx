@@ -7,11 +7,8 @@ use std::{
     task::{Context, Poll},
 };
 
-use axum::{
-    http::{header::LOCATION, Request, StatusCode},
-    response::Response,
-};
 use futures_core::ready;
+use http::{header::LOCATION, response::Response, Request, StatusCode};
 use pin_project_lite::pin_project;
 use tower::{Layer, Service};
 
