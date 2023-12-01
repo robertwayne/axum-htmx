@@ -23,7 +23,7 @@ impl HxEvent {
         }
     }
 
-    /// Creates new event with event data.
+    /// Creates new event with data.
     #[cfg(feature = "serde")]
     #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
     pub fn new_with_data<T: ::serde::Serialize>(
@@ -116,8 +116,10 @@ impl IntoResponseParts for HxResponseTrigger {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
-        res.headers_mut()
-            .insert(headers::HX_TRIGGER, events_to_header_value(self.0)?);
+        if !self.0.is_empty() {
+            res.headers_mut()
+                .insert(headers::HX_TRIGGER, events_to_header_value(self.0)?);
+        }
 
         Ok(res)
     }
@@ -148,8 +150,10 @@ impl IntoResponseParts for HxResponseTriggerAfterSettle {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
-        res.headers_mut()
-            .insert(headers::HX_TRIGGER, events_to_header_value(self.0)?);
+        if !self.0.is_empty() {
+            res.headers_mut()
+                .insert(headers::HX_TRIGGER, events_to_header_value(self.0)?);
+        }
 
         Ok(res)
     }
@@ -180,8 +184,10 @@ impl IntoResponseParts for HxResponseTriggerAfterSwap {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
-        res.headers_mut()
-            .insert(headers::HX_TRIGGER, events_to_header_value(self.0)?);
+        if !self.0.is_empty() {
+            res.headers_mut()
+                .insert(headers::HX_TRIGGER, events_to_header_value(self.0)?);
+        }
 
         Ok(res)
     }
@@ -210,5 +216,8 @@ mod tests {
         let expected_value = r#"{"my-event":{"level":"info","message":{"body":"This is a test message.","title":"Hello, world!"}}}"#;
 
         assert_eq!(header_value, HeaderValue::from_static(expected_value));
+
+        let value = events_to_header_value(HxResponseTrigger::from(["foo", "bar"]).0).unwrap();
+        assert_eq!(value, HeaderValue::from_static("foo, bar"));
     }
 }
