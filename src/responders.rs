@@ -1,6 +1,6 @@
 //! Axum responses for htmx response headers.
 
-use std::convert::Infallible;
+use std::{convert::Infallible, str::FromStr};
 
 use axum_core::response::{IntoResponse, IntoResponseParts, ResponseParts};
 use http::{header::InvalidHeaderValue, HeaderValue, StatusCode, Uri};
@@ -32,15 +32,71 @@ const HX_SWAP_NONE: &str = "none";
 ///
 /// See <https://htmx.org/headers/hx-location/> for more information.
 #[derive(Debug, Clone)]
-pub struct HxLocation(pub Uri);
+pub struct HxLocation {
+    /// Uri of the new location.
+    pub uri: Uri,
+    /// Extra options.
+    #[cfg(feature = "serde")]
+    #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
+    pub options: serde::LocationOptions,
+}
+
+impl HxLocation {
+    pub fn from_uri(uri: Uri) -> Self {
+        Self {
+            #[cfg(feature = "serde")]
+            options: serde::LocationOptions::default(),
+            uri,
+        }
+    }
+
+    #[cfg(feature = "serde")]
+    #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
+    pub fn from_uri_with_options(uri: Uri, options: serde::LocationOptions) -> Self {
+        Self { uri, options }
+    }
+
+    #[cfg(feature = "serde")]
+    fn into_header_with_options(self) -> Result<String, HxError> {
+        if self.options.is_default() {
+            return Ok(self.uri.to_string());
+        }
+
+        #[derive(::serde::Serialize)]
+        struct LocWithOpts {
+            path: String,
+            #[serde(flatten)]
+            opts: serde::LocationOptions,
+        }
+
+        let loc_with_opts = LocWithOpts {
+            path: self.uri.to_string(),
+            opts: self.options,
+        };
+        Ok(serde_json::to_string(&loc_with_opts)?)
+    }
+}
+
+impl<'a> TryFrom<&'a str> for HxLocation {
+    type Error = <Uri as FromStr>::Err;
+
+    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
+        Ok(Self::from_uri(Uri::from_str(value)?))
+    }
+}
 
 impl IntoResponseParts for HxLocation {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
+        #[cfg(feature = "serde")]
+        let header = self.into_header_with_options()?;
+        #[cfg(not(feature = "serde"))]
+        let header = self.uri.to_string();
+
         res.headers_mut().insert(
             headers::HX_LOCATION,
-            HeaderValue::from_maybe_shared(self.0.to_string())?,
+            HeaderValue::from_maybe_shared(header)?,
         );
 
         Ok(res)
@@ -71,6 +127,14 @@ impl IntoResponseParts for HxPushUrl {
     }
 }
 
+impl<'a> TryFrom<&'a str> for HxPushUrl {
+    type Error = <Uri as FromStr>::Err;
+
+    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
+        Ok(Self(value.parse()?))
+    }
+}
+
 /// The `HX-Redirect` header.
 ///
 /// Can be used to do a client-side redirect to a new location.
@@ -90,6 +154,14 @@ impl IntoResponseParts for HxRedirect {
         );
 
         Ok(res)
+    }
+}
+
+impl<'a> TryFrom<&'a str> for HxRedirect {
+    type Error = <Uri as FromStr>::Err;
+
+    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
+        Ok(Self(value.parse()?))
     }
 }
 
@@ -139,6 +211,14 @@ impl IntoResponseParts for HxReplaceUrl {
         );
 
         Ok(res)
+    }
+}
+
+impl<'a> TryFrom<&'a str> for HxReplaceUrl {
+    type Error = <Uri as FromStr>::Err;
+
+    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
+        Ok(Self(value.parse()?))
     }
 }
 
@@ -206,6 +286,71 @@ impl IntoResponseParts for HxReselect {
     }
 }
 
+/// Represents a client-side event carrying optional data.
+#[derive(Debug, Clone, ::serde::Serialize)]
+pub struct HxEvent {
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg(feature = "serde")]
+    #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
+    pub data: Option<::serde_json::Value>,
+}
+
+impl HxEvent {
+    /// Creates new event with no associated data.
+    pub fn new(name: String) -> Self {
+        Self {
+            name: name.to_string(),
+            data: None,
+        }
+    }
+
+    /// Creates new event with event data.
+    #[cfg(feature = "serde")]
+    #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
+    pub fn new_with_data<T: ::serde::Serialize>(
+        name: impl ToString,
+        data: T,
+    ) -> Result<Self, serde_json::Error> {
+        let data = serde_json::to_value(data)?;
+
+        Ok(Self {
+            name: name.to_string(),
+            data: Some(data),
+        })
+    }
+}
+
+#[cfg(feature = "serde")]
+fn events_to_header_value(events: Vec<HxEvent>) -> Result<HeaderValue, HxError> {
+    use std::collections::HashMap;
+
+    use serde_json::Value;
+
+    let with_data = events.iter().any(|e| e.data.is_some());
+
+    let header_value = if with_data {
+        // at least one event contains data so the header_value needs to be json
+        // encoded.
+        let header_value = events
+            .into_iter()
+            .map(|e| (e.name, e.data.unwrap_or_default()))
+            .collect::<HashMap<String, Value>>();
+
+        serde_json::to_string(&header_value)?
+    } else {
+        // no event contains data, the event names can be put in the header
+        // value separated by a comma.
+        events
+            .into_iter()
+            .map(|e| e.name)
+            .reduce(|acc, e| acc + ", " + &e)
+            .unwrap_or_default()
+    };
+
+    HeaderValue::from_maybe_shared(header_value).map_err(HxError::from)
+}
+
 /// The `HX-Trigger` header.
 ///
 /// Allows you to trigger client-side events. If you intend to add data to your
@@ -217,15 +362,15 @@ impl IntoResponseParts for HxReselect {
 ///
 /// See <https://htmx.org/headers/hx-trigger/> for more information.
 #[derive(Debug, Clone)]
-pub struct HxResponseTrigger(pub Vec<String>);
+pub struct HxResponseTrigger(pub Vec<HxEvent>);
 
 impl<T> From<T> for HxResponseTrigger
 where
     T: IntoIterator,
-    T::Item: ToString,
+    T::Item: Into<HxEvent>,
 {
     fn from(value: T) -> Self {
-        Self(value.into_iter().map(|s| s.to_string()).collect())
+        Self(value.into_iter().map(Into::into).collect())
     }
 }
 
@@ -233,15 +378,8 @@ impl IntoResponseParts for HxResponseTrigger {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
-        res.headers_mut().insert(
-            headers::HX_TRIGGER,
-            HeaderValue::from_maybe_shared(
-                self.0
-                    .into_iter()
-                    .reduce(|acc, e| acc + ", " + &e)
-                    .unwrap_or_default(),
-            )?,
-        );
+        res.headers_mut()
+            .insert(headers::HX_TRIGGER, events_to_header_value(self.0)?);
 
         Ok(res)
     }
@@ -259,15 +397,15 @@ impl IntoResponseParts for HxResponseTrigger {
 ///
 /// See <https://htmx.org/headers/hx-trigger/> for more information.
 #[derive(Debug, Clone)]
-pub struct HxResponseTriggerAfterSettle(pub Vec<String>);
+pub struct HxResponseTriggerAfterSettle(pub Vec<HxEvent>);
 
 impl<T> From<T> for HxResponseTriggerAfterSettle
 where
     T: IntoIterator,
-    T::Item: ToString,
+    T::Item: Into<HxEvent>,
 {
     fn from(value: T) -> Self {
-        Self(value.into_iter().map(|s| s.to_string()).collect())
+        Self(value.into_iter().map(Into::into).collect())
     }
 }
 
@@ -275,15 +413,8 @@ impl IntoResponseParts for HxResponseTriggerAfterSettle {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
-        res.headers_mut().insert(
-            headers::HX_TRIGGER_AFTER_SETTLE,
-            HeaderValue::from_maybe_shared(
-                self.0
-                    .into_iter()
-                    .reduce(|acc, e| acc + ", " + &e)
-                    .unwrap_or_default(),
-            )?,
-        );
+        res.headers_mut()
+            .insert(headers::HX_TRIGGER, events_to_header_value(self.0)?);
 
         Ok(res)
     }
@@ -300,15 +431,15 @@ impl IntoResponseParts for HxResponseTriggerAfterSettle {
 ///
 /// See <https://htmx.org/headers/hx-trigger/> for more information.
 #[derive(Debug, Clone)]
-pub struct HxResponseTriggerAfterSwap(pub Vec<String>);
+pub struct HxResponseTriggerAfterSwap(pub Vec<HxEvent>);
 
 impl<T> From<T> for HxResponseTriggerAfterSwap
 where
     T: IntoIterator,
-    T::Item: ToString,
+    T::Item: Into<HxEvent>,
 {
     fn from(value: T) -> Self {
-        Self(value.into_iter().map(|s| s.to_string()).collect())
+        Self(value.into_iter().map(Into::into).collect())
     }
 }
 
@@ -316,15 +447,8 @@ impl IntoResponseParts for HxResponseTriggerAfterSwap {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
-        res.headers_mut().insert(
-            headers::HX_TRIGGER_AFTER_SWAP,
-            HeaderValue::from_maybe_shared(
-                self.0
-                    .into_iter()
-                    .reduce(|acc, e| acc + ", " + &e)
-                    .unwrap_or_default(),
-            )?,
-        );
+        res.headers_mut()
+            .insert(headers::HX_TRIGGER, events_to_header_value(self.0)?);
 
         Ok(res)
     }
@@ -353,6 +477,32 @@ pub enum SwapOption {
     None,
 }
 
+// can be removed  and automatically derived when
+// https://github.com/serde-rs/serde/issues/2485 is implemented
+#[cfg(feature = "serde")]
+impl ::serde::Serialize for SwapOption {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: ::serde::Serializer,
+    {
+        const UNIT_NAME: &str = "SwapOption";
+        match self {
+            Self::InnerHtml => serializer.serialize_unit_variant(UNIT_NAME, 0, HX_SWAP_INNER_HTML),
+            Self::OuterHtml => serializer.serialize_unit_variant(UNIT_NAME, 1, HX_SWAP_OUTER_HTML),
+            Self::BeforeBegin => {
+                serializer.serialize_unit_variant(UNIT_NAME, 2, HX_SWAP_BEFORE_BEGIN)
+            }
+            Self::AfterBegin => {
+                serializer.serialize_unit_variant(UNIT_NAME, 3, HX_SWAP_AFTER_BEGIN)
+            }
+            Self::BeforeEnd => serializer.serialize_unit_variant(UNIT_NAME, 4, HX_SWAP_BEFORE_END),
+            Self::AfterEnd => serializer.serialize_unit_variant(UNIT_NAME, 5, HX_SWAP_AFTER_END),
+            Self::Delete => serializer.serialize_unit_variant(UNIT_NAME, 6, HX_SWAP_DELETE),
+            Self::None => serializer.serialize_unit_variant(UNIT_NAME, 7, HX_SWAP_NONE),
+        }
+    }
+}
+
 impl From<SwapOption> for HeaderValue {
     fn from(value: SwapOption) -> Self {
         match value {
@@ -373,7 +523,8 @@ pub enum HxError {
     InvalidHeaderValue(InvalidHeaderValue),
 
     #[cfg(feature = "serde")]
-    Serialization(serde_json::Error),
+    #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
+    Json(serde_json::Error),
 }
 
 impl From<InvalidHeaderValue> for HxError {
@@ -383,9 +534,10 @@ impl From<InvalidHeaderValue> for HxError {
 }
 
 #[cfg(feature = "serde")]
+#[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
 impl From<serde_json::Error> for HxError {
     fn from(value: serde_json::Error) -> Self {
-        Self::Serialization(value)
+        Self::Json(value)
     }
 }
 
@@ -397,11 +549,59 @@ impl IntoResponse for HxError {
             }
 
             #[cfg(feature = "serde")]
-            Self::Serialization(_) => (
+            Self::Json(_) => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "failed to serialize event",
             )
                 .into_response(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use http::HeaderValue;
+    use serde_json::json;
+
+    use crate::{responders::events_to_header_value, HxEvent};
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_serialize_location() {
+        use crate::{serde::LocationOptions, HxLocation, SwapOption::InnerHtml};
+
+        let loc = HxLocation::try_from("/foo").unwrap();
+        assert_eq!(loc.into_header_with_options().unwrap(), "/foo");
+
+        let loc = HxLocation::from_uri_with_options(
+            "/foo".parse().unwrap(),
+            LocationOptions {
+                event: Some("click".into()),
+                swap: Some(InnerHtml),
+                ..Default::default()
+            },
+        );
+        assert_eq!(
+            loc.into_header_with_options().unwrap(),
+            r#"{"path":"/foo","event":"click","swap":"innerHTML"}"#
+        );
+    }
+
+    #[test]
+    fn valid_event_to_header_encoding() {
+        let evt = HxEvent::new_with_data(
+            "my-event",
+            json!({"level": "info", "message": {
+                "body": "This is a test message.",
+                "title": "Hello, world!",
+            }}),
+        )
+        .unwrap();
+
+        let header_value = events_to_header_value(vec![evt]).unwrap();
+
+        let expected_value = r#"{"my-event":{"level":"info","message":{"body":"This is a test message.","title":"Hello, world!"}}}"#;
+
+        assert_eq!(header_value, HeaderValue::from_static(expected_value));
     }
 }
