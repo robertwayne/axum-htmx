@@ -211,9 +211,9 @@ impl IntoResponseParts for HxRetarget {
     }
 }
 
-impl From<String> for HxRetarget {
-    fn from(value: String) -> Self {
-        Self(value)
+impl<T: Into<String>> From<T> for HxRetarget {
+    fn from(value: T) -> Self {
+        Self(value.into())
     }
 }
 
@@ -240,9 +240,9 @@ impl IntoResponseParts for HxReselect {
     }
 }
 
-impl From<String> for HxReselect {
-    fn from(value: String) -> Self {
-        Self(value)
+impl<T: Into<String>> From<T> for HxReselect {
+    fn from(value: T) -> Self {
+        Self(value.into())
     }
 }
 
