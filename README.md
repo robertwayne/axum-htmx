@@ -46,16 +46,16 @@ succeed and never return an error. In the case where a header is not present,
 the extractor will return `None` or `false` dependant on the expected return
 type.
 
-| Header                       | Extractor                 | Value            |
-|------------------------------|---------------------------|------------------|
-| `HX-Boosted`                 | `HxBoosted`               | `bool`           |
-| `HX-Current-URL`             | `HxCurrentUrl`            | `Option<String>` |
-| `HX-History-Restore-Request` | `HxHistoryRestoreRequest` | `bool`           |
-| `HX-Prompt`                  | `HxPrompt`                | `Option<String>` |
-| `HX-Request`                 | `HxRequest`               | `bool`           |
-| `HX-Target`                  | `HxTarget`                | `Option<String>` |
-| `HX-Trigger-Name`            | `HxTriggerName`           | `Option<String>` |
-| `HX-Trigger`                 | `HxTrigger`               | `Option<String>` |
+| Header                       | Extractor                 | Value                     |
+|------------------------------|---------------------------|---------------------------|
+| `HX-Boosted`                 | `HxBoosted`               | `bool`                    |
+| `HX-Current-URL`             | `HxCurrentUrl`            | `Option<axum::http::Uri>` |
+| `HX-History-Restore-Request` | `HxHistoryRestoreRequest` | `bool`                    |
+| `HX-Prompt`                  | `HxPrompt`                | `Option<String>`          |
+| `HX-Request`                 | `HxRequest`               | `bool`                    |
+| `HX-Target`                  | `HxTarget`                | `Option<String>`          |
+| `HX-Trigger-Name`            | `HxTriggerName`           | `Option<String>`          |
+| `HX-Trigger`                 | `HxTrigger`               | `Option<String>`          |
 
 ## Responders
 
@@ -64,19 +64,19 @@ have a supported responder. A responder is a basic type that implements
 `IntoResponseParts`, allowing you to simply and safely apply the HX-* headers to
 any of your responses.
 
-| Header                    | Responder                      | Value                                    |
-|---------------------------|--------------------------------|------------------------------------------|
-| `HX-Location`             | `HxLocation`                   | `axum::http::Uri`                        |
-| `HX-Push-Url`             | `HxPushUrl`                    | `axum::http::Uri`                        |
-| `HX-Redirect`             | `HxRedirect`                   | `axum::http::Uri`                        |
-| `HX-Refresh`              | `HxRefresh`                    | `bool`                                   |
-| `HX-Replace-Url`          | `HxReplaceUrl`                 | `axum::http::Uri`                        |
-| `HX-Reswap`               | `HxReswap`                     | `axum_htmx::responders::SwapOption`      |
-| `HX-Retarget`             | `HxRetarget`                   | `String`                                 |
-| `HX-Reselect`             | `HxReselect`                   | `String`                                 |
-| `HX-Trigger`              | `HxResponseTrigger`            | `axum_htmx::serde::HxEvent`              |
-| `HX-Trigger-After-Settle` | `HxResponseTrigger`            | `axum_htmx::serde::HxEvent`              |
-| `HX-Trigger-After-Swap`   | `HxResponseTrigger`            | `axum_htmx::serde::HxEvent`              |
+| Header                    | Responder           | Value                               |
+|---------------------------|---------------------|-------------------------------------|
+| `HX-Location`             | `HxLocation`        | `axum::http::Uri`                   |
+| `HX-Push-Url`             | `HxPushUrl`         | `axum::http::Uri`                   |
+| `HX-Redirect`             | `HxRedirect`        | `axum::http::Uri`                   |
+| `HX-Refresh`              | `HxRefresh`         | `bool`                              |
+| `HX-Replace-Url`          | `HxReplaceUrl`      | `axum::http::Uri`                   |
+| `HX-Reswap`               | `HxReswap`          | `axum_htmx::responders::SwapOption` |
+| `HX-Retarget`             | `HxRetarget`        | `String`                            |
+| `HX-Reselect`             | `HxReselect`        | `String`                            |
+| `HX-Trigger`              | `HxResponseTrigger` | `axum_htmx::serde::HxEvent`         |
+| `HX-Trigger-After-Settle` | `HxResponseTrigger` | `axum_htmx::serde::HxEvent`         |
+| `HX-Trigger-After-Swap`   | `HxResponseTrigger` | `axum_htmx::serde::HxEvent`         |
 
 ## Request Guards
 
