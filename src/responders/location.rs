@@ -83,6 +83,7 @@ impl HxLocation {
             path: self.uri.to_string(),
             opts: self.options,
         };
+        
         Ok(serde_json::to_string(&loc_with_opts)?)
     }
 }

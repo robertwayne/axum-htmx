@@ -57,6 +57,7 @@ fn events_to_header_value(events: Vec<HxEvent>) -> Result<http::HeaderValue, HxE
         .map(|HxEvent { name }| name)
         .collect::<Vec<_>>()
         .join(", ");
+
     http::HeaderValue::from_str(&header).map_err(Into::into)
 }
 

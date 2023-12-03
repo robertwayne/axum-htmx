@@ -60,6 +60,7 @@ where
                 .to_str()
                 .ok()
                 .and_then(|url| url.parse::<http::Uri>().ok());
+            
             return Ok(HxCurrentUrl(url));
         }
 
