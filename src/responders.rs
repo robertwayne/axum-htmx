@@ -45,6 +45,12 @@ impl IntoResponseParts for HxPushUrl {
     }
 }
 
+impl From<Uri> for HxPushUrl {
+    fn from(uri: Uri) -> Self {
+        Self(uri)
+    }
+}
+
 impl<'a> TryFrom<&'a str> for HxPushUrl {
     type Error = <Uri as FromStr>::Err;
 
@@ -75,6 +81,12 @@ impl IntoResponseParts for HxRedirect {
     }
 }
 
+impl From<Uri> for HxRedirect {
+    fn from(uri: Uri) -> Self {
+        Self(uri)
+    }
+}
+
 impl<'a> TryFrom<&'a str> for HxRedirect {
     type Error = <Uri as FromStr>::Err;
 
@@ -90,6 +102,12 @@ impl<'a> TryFrom<&'a str> for HxRedirect {
 /// This responder will never fail.
 #[derive(Debug, Copy, Clone)]
 pub struct HxRefresh(pub bool);
+
+impl From<bool> for HxRefresh {
+    fn from(value: bool) -> Self {
+        Self(value)
+    }
+}
 
 impl IntoResponseParts for HxRefresh {
     type Error = Infallible;
@@ -132,6 +150,12 @@ impl IntoResponseParts for HxReplaceUrl {
     }
 }
 
+impl From<Uri> for HxReplaceUrl {
+    fn from(uri: Uri) -> Self {
+        Self(uri)
+    }
+}
+
 impl<'a> TryFrom<&'a str> for HxReplaceUrl {
     type Error = <Uri as FromStr>::Err;
 
@@ -158,6 +182,12 @@ impl IntoResponseParts for HxReswap {
     }
 }
 
+impl From<SwapOption> for HxReswap {
+    fn from(value: SwapOption) -> Self {
+        Self(value)
+    }
+}
+
 /// The `HX-Retarget` header.
 ///
 /// A CSS selector that updates the target of the content update to a different
@@ -181,6 +211,12 @@ impl IntoResponseParts for HxRetarget {
     }
 }
 
+impl From<String> for HxRetarget {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+
 /// The `HX-Reselect` header.
 ///
 /// A CSS selector that allows you to choose which part of the response is used
@@ -201,6 +237,12 @@ impl IntoResponseParts for HxReselect {
         );
 
         Ok(res)
+    }
+}
+
+impl From<String> for HxReselect {
+    fn from(value: String) -> Self {
+        Self(value)
     }
 }
 

@@ -141,6 +141,19 @@ impl HxResponseTrigger {
     }
 }
 
+impl<T> From<(TriggerMode, T)> for HxResponseTrigger
+where
+    T: IntoIterator,
+    T::Item: Into<HxEvent>,
+{
+    fn from((mode, events): (TriggerMode, T)) -> Self {
+        Self {
+            mode,
+            events: events.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
 impl IntoResponseParts for HxResponseTrigger {
     type Error = HxError;
 
