@@ -42,10 +42,10 @@ where
 /// This is set on every request made by htmx itself. As its name implies, it
 /// just contains the current url.
 ///
-/// This extractor will always return a value. If the header is not present, it
-/// will return `None`.
+/// This extractor will always return a value. If the header is not present, or extractor fails to parse the url
+/// it will return `None`.
 #[derive(Debug, Clone)]
-pub struct HxCurrentUrl(pub Option<String>);
+pub struct HxCurrentUrl(pub Option<http::Uri>);
 
 #[async_trait]
 impl<S> FromRequestParts<S> for HxCurrentUrl
@@ -56,9 +56,11 @@ where
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
         if let Some(url) = parts.headers.get(HX_CURRENT_URL) {
-            if let Ok(url) = url.to_str() {
-                return Ok(HxCurrentUrl(Some(url.to_string())));
-            }
+            let url = url
+                .to_str()
+                .ok()
+                .and_then(|url| url.parse::<http::Uri>().ok());
+            return Ok(HxCurrentUrl(url));
         }
 
         return Ok(HxCurrentUrl(None));
