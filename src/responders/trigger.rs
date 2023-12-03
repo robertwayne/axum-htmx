@@ -15,9 +15,9 @@ pub struct HxEvent {
 
 impl HxEvent {
     /// Creates new event with no associated data.
-    pub fn new(name: String) -> Self {
+    pub fn new(name: impl AsRef<str>) -> Self {
         Self {
-            name: name.to_string(),
+            name: name.as_ref().to_owned(),
             #[cfg(feature = "serde")]
             data: None,
         }
