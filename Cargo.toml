@@ -7,7 +7,7 @@ repository = "https://github.com/robertwayne/axum-htmx"
 categories = ["web-programming"]
 keywords = ["axum", "htmx"]
 readme = "README.md"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2021"
 
 [features]
@@ -18,8 +18,8 @@ serde = ["dep:serde", "dep:serde_json"]
 
 [dependencies]
 axum-core = "0.4"
-http = { version = "1.0.0", default-features = false }
-async-trait = "0.1.74"
+http = { version = "1.0", default-features = false }
+async-trait = "0.1"
 
 # Optional dependencies required for the `guards` feature.
 tower = { version = "0.4", default-features = false, optional = true }
@@ -31,7 +31,7 @@ serde = { version = "1", features = ["derive"], optional = true }
 serde_json = { version = "1", optional = true }
 
 [dev-dependencies]
-axum = { version = "0.7.1", default-features = false }
+axum = { version = "0.7", default-features = false }
 
 [package.metadata.docs.rs]
 all-features = true
