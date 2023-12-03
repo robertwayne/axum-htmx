@@ -135,7 +135,7 @@ use axum_htmx::HxResponseTrigger;
 async fn index() -> (&'static str, HxResponseTrigger) {
     (
         "Hello, world!",
-        HxResponseTrigger::from(["my-event", "second-event"]),
+        HxResponseTrigger::normal(["my-event", "second-event"]),
     )
 }
 ```
@@ -161,7 +161,7 @@ async fn index() -> (&'static str, HxResponseTrigger) {
     )
     .unwrap();
 
-    ("Hello, world!", HxResponseTrigger(vec![event]))
+    ("Hello, world!", HxResponseTrigger::normal([event]))
 }
 ```
 
