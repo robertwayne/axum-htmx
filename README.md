@@ -74,11 +74,9 @@ any of your responses.
 | `HX-Reswap`               | `HxReswap`                     | `axum_htmx::responders::SwapOption`      |
 | `HX-Retarget`             | `HxRetarget`                   | `String`                                 |
 | `HX-Reselect`             | `HxReselect`                   | `String`                                 |
-| `HX-Trigger`              | `HxResponseTrigger`            | `String` or `axum_htmx::serde::HxEvent`* |
-| `HX-Trigger-After-Settle` | `HxResponseTriggerAfterSettle` | `String` or `axum_htmx::serde::HxEvent`* |
-| `HX-Trigger-After-Swap`   | `HxResponseTriggerAfterSwap`   | `String` or `axum_htmx::serde::HxEvent`* |
-
-_* requires the `serde` feature flag to be enabled._
+| `HX-Trigger`              | `HxResponseTrigger`            | `axum_htmx::serde::HxEvent`              |
+| `HX-Trigger-After-Settle` | `HxResponseTrigger`            | `axum_htmx::serde::HxEvent`              |
+| `HX-Trigger-After-Swap`   | `HxResponseTrigger`            | `axum_htmx::serde::HxEvent`              |
 
 ## Request Guards
 
@@ -137,7 +135,7 @@ use axum_htmx::HxResponseTrigger;
 async fn index() -> (&'static str, HxResponseTrigger) {
     (
         "Hello, world!",
-        HxResponseTrigger(vec!["my-event".to_string()]),
+        HxResponseTrigger::from(["my-event", "second-event"]),
     )
 }
 ```
@@ -146,16 +144,16 @@ async fn index() -> (&'static str, HxResponseTrigger) {
 can use via the `serde` feature flag and the `HxEvent` type.
 
 ```rust
-use axum_htmx::serde::HxEvent;
 use serde_json::json;
 
 // Note that we are using `HxResponseTrigger` from the `axum_htmx::serde` module
 // instead of the root module.
-use axum_htmx::serde::HxResponseTrigger;
+use axum_htmx::{HxEvent, HxResponseTrigger};
 
 async fn index() -> (&'static str, HxResponseTrigger) {
     let event = HxEvent::new_with_data(
         "my-event",
+        // May be any object that implements `serde::Serialize`
         json!({"level": "info", "message": {
             "title": "Hello, world!",
             "body": "This is a test message.",
@@ -188,10 +186,10 @@ fn router_two() -> Router {
 ## Feature Flags
 
 <!-- markdownlint-disable -->
-| Flag     | Default  | Description                                                                        | Dependencies                                |
-|----------|----------|------------------------------------------------------------------------------------|---------------------------------------------|
-| `guards` | Disabled | Adds request guard layers.                                                         | `tower`, `futures-core`, `pin-project-lite` |
-| `serde`  | Disabled | Adds serde support for the `HxResponseTrigger*` and `HxLocation` response headers. | `serde`, `serde_json`                       |
+| Flag     | Default  | Description                                                | Dependencies                                |
+|----------|----------|------------------------------------------------------------|---------------------------------------------|
+| `guards` | Disabled | Adds request guard layers.                                 | `tower`, `futures-core`, `pin-project-lite` |
+| `serde`  | Disabled | Adds serde support for the `HxEvent` and `LocationOptions` | `serde`, `serde_json`                       |
 <!-- markdownlint-enable -->
 
 ## Contributing

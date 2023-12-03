@@ -1,15 +1,16 @@
 //! Axum responses for htmx response headers.
 
-use std::convert::Infallible;
+use std::{convert::Infallible, str::FromStr};
 
-use axum_core::response::{IntoResponse, IntoResponseParts, ResponseParts};
-use http::{header::InvalidHeaderValue, HeaderValue, StatusCode, Uri};
+use axum_core::response::{IntoResponseParts, ResponseParts};
+use http::{HeaderValue, Uri};
 
-use crate::headers;
+use crate::{headers, HxError};
 
-#[cfg(feature = "serde")]
-#[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
-pub mod serde;
+mod location;
+pub use location::*;
+mod trigger;
+pub use trigger::*;
 
 const HX_SWAP_INNER_HTML: &str = "innerHTML";
 const HX_SWAP_OUTER_HTML: &str = "outerHTML";
@@ -19,33 +20,6 @@ const HX_SWAP_BEFORE_END: &str = "beforeend";
 const HX_SWAP_AFTER_END: &str = "afterend";
 const HX_SWAP_DELETE: &str = "delete";
 const HX_SWAP_NONE: &str = "none";
-
-/// The `HX-Location` header.
-///
-/// This response header can be used to trigger a client side redirection
-/// without reloading the whole page. If you intend to redirect to a specific
-/// target on the page, you must enable the `serde` feature flag and use
-/// `axum_htmx::responders::serde::HxLocation` instead.
-///
-/// Will fail if the supplied Uri contains characters that are not visible ASCII
-/// (32-127).
-///
-/// See <https://htmx.org/headers/hx-location/> for more information.
-#[derive(Debug, Clone)]
-pub struct HxLocation(pub Uri);
-
-impl IntoResponseParts for HxLocation {
-    type Error = HxError;
-
-    fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
-        res.headers_mut().insert(
-            headers::HX_LOCATION,
-            HeaderValue::from_maybe_shared(self.0.to_string())?,
-        );
-
-        Ok(res)
-    }
-}
 
 /// The `HX-Push-Url` header.
 ///
@@ -71,6 +45,20 @@ impl IntoResponseParts for HxPushUrl {
     }
 }
 
+impl From<Uri> for HxPushUrl {
+    fn from(uri: Uri) -> Self {
+        Self(uri)
+    }
+}
+
+impl<'a> TryFrom<&'a str> for HxPushUrl {
+    type Error = <Uri as FromStr>::Err;
+
+    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
+        Ok(Self(value.parse()?))
+    }
+}
+
 /// The `HX-Redirect` header.
 ///
 /// Can be used to do a client-side redirect to a new location.
@@ -93,6 +81,20 @@ impl IntoResponseParts for HxRedirect {
     }
 }
 
+impl From<Uri> for HxRedirect {
+    fn from(uri: Uri) -> Self {
+        Self(uri)
+    }
+}
+
+impl<'a> TryFrom<&'a str> for HxRedirect {
+    type Error = <Uri as FromStr>::Err;
+
+    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
+        Ok(Self(value.parse()?))
+    }
+}
+
 /// The `HX-Refresh`header.
 ///
 /// If set to `true` the client-side will do a full refresh of the page.
@@ -100,6 +102,12 @@ impl IntoResponseParts for HxRedirect {
 /// This responder will never fail.
 #[derive(Debug, Copy, Clone)]
 pub struct HxRefresh(pub bool);
+
+impl From<bool> for HxRefresh {
+    fn from(value: bool) -> Self {
+        Self(value)
+    }
+}
 
 impl IntoResponseParts for HxRefresh {
     type Error = Infallible;
@@ -142,6 +150,20 @@ impl IntoResponseParts for HxReplaceUrl {
     }
 }
 
+impl From<Uri> for HxReplaceUrl {
+    fn from(uri: Uri) -> Self {
+        Self(uri)
+    }
+}
+
+impl<'a> TryFrom<&'a str> for HxReplaceUrl {
+    type Error = <Uri as FromStr>::Err;
+
+    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
+        Ok(Self(value.parse()?))
+    }
+}
+
 /// The `HX-Reswap` header.
 ///
 /// Allows you to specidy how the response will be swapped.
@@ -157,6 +179,12 @@ impl IntoResponseParts for HxReswap {
         res.headers_mut().insert(headers::HX_RESWAP, self.0.into());
 
         Ok(res)
+    }
+}
+
+impl From<SwapOption> for HxReswap {
+    fn from(value: SwapOption) -> Self {
+        Self(value)
     }
 }
 
@@ -183,6 +211,12 @@ impl IntoResponseParts for HxRetarget {
     }
 }
 
+impl<T: Into<String>> From<T> for HxRetarget {
+    fn from(value: T) -> Self {
+        Self(value.into())
+    }
+}
+
 /// The `HX-Reselect` header.
 ///
 /// A CSS selector that allows you to choose which part of the response is used
@@ -206,127 +240,9 @@ impl IntoResponseParts for HxReselect {
     }
 }
 
-/// The `HX-Trigger` header.
-///
-/// Allows you to trigger client-side events. If you intend to add data to your
-/// events, you must enable the `serde` feature flag and use
-/// `axum_htmx::responders::serde::HxResponseTrigger` instead.
-///
-/// Will fail if the supplied events contain or produce characters that are not
-/// visible ASCII (32-127) when serializing to JSON.
-///
-/// See <https://htmx.org/headers/hx-trigger/> for more information.
-#[derive(Debug, Clone)]
-pub struct HxResponseTrigger(pub Vec<String>);
-
-impl<T> From<T> for HxResponseTrigger
-where
-    T: IntoIterator,
-    T::Item: ToString,
-{
+impl<T: Into<String>> From<T> for HxReselect {
     fn from(value: T) -> Self {
-        Self(value.into_iter().map(|s| s.to_string()).collect())
-    }
-}
-
-impl IntoResponseParts for HxResponseTrigger {
-    type Error = HxError;
-
-    fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
-        res.headers_mut().insert(
-            headers::HX_TRIGGER,
-            HeaderValue::from_maybe_shared(
-                self.0
-                    .into_iter()
-                    .reduce(|acc, e| acc + ", " + &e)
-                    .unwrap_or_default(),
-            )?,
-        );
-
-        Ok(res)
-    }
-}
-
-/// The `HX-Trigger-After-Settle` header.
-///
-/// Allows you to trigger client-side events after the settle step. If you
-/// intend to add data to your events, you must enable the `serde` feature flag
-/// and use `axum_htmx::responders::serde::HxResponseTriggerAfterSettle`
-/// instead.
-///
-/// Will fail if the supplied events contain or produce characters that are not
-/// visible ASCII (32-127) when serializing to JSON.
-///
-/// See <https://htmx.org/headers/hx-trigger/> for more information.
-#[derive(Debug, Clone)]
-pub struct HxResponseTriggerAfterSettle(pub Vec<String>);
-
-impl<T> From<T> for HxResponseTriggerAfterSettle
-where
-    T: IntoIterator,
-    T::Item: ToString,
-{
-    fn from(value: T) -> Self {
-        Self(value.into_iter().map(|s| s.to_string()).collect())
-    }
-}
-
-impl IntoResponseParts for HxResponseTriggerAfterSettle {
-    type Error = HxError;
-
-    fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
-        res.headers_mut().insert(
-            headers::HX_TRIGGER_AFTER_SETTLE,
-            HeaderValue::from_maybe_shared(
-                self.0
-                    .into_iter()
-                    .reduce(|acc, e| acc + ", " + &e)
-                    .unwrap_or_default(),
-            )?,
-        );
-
-        Ok(res)
-    }
-}
-
-/// The `HX-Trigger-After-Swap` header.
-///
-/// Allows you to trigger client-side events after the swap step. If you intend
-/// to add data to your events, you must enable the `serde` feature flag and use
-/// `axum_htmx::responders::serde::HxResponseTriggerAfterSwap` instead.
-///
-/// Will fail if the supplied events contain or produce characters that are not
-/// visible ASCII (32-127) when serializing to JSON.
-///
-/// See <https://htmx.org/headers/hx-trigger/> for more information.
-#[derive(Debug, Clone)]
-pub struct HxResponseTriggerAfterSwap(pub Vec<String>);
-
-impl<T> From<T> for HxResponseTriggerAfterSwap
-where
-    T: IntoIterator,
-    T::Item: ToString,
-{
-    fn from(value: T) -> Self {
-        Self(value.into_iter().map(|s| s.to_string()).collect())
-    }
-}
-
-impl IntoResponseParts for HxResponseTriggerAfterSwap {
-    type Error = HxError;
-
-    fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
-        res.headers_mut().insert(
-            headers::HX_TRIGGER_AFTER_SWAP,
-            HeaderValue::from_maybe_shared(
-                self.0
-                    .into_iter()
-                    .reduce(|acc, e| acc + ", " + &e)
-                    .unwrap_or_default(),
-            )?,
-        );
-
-        Ok(res)
+        Self(value.into())
     }
 }
 
@@ -353,6 +269,32 @@ pub enum SwapOption {
     None,
 }
 
+// can be removed  and automatically derived when
+// https://github.com/serde-rs/serde/issues/2485 is implemented
+#[cfg(feature = "serde")]
+impl ::serde::Serialize for SwapOption {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: ::serde::Serializer,
+    {
+        const UNIT_NAME: &str = "SwapOption";
+        match self {
+            Self::InnerHtml => serializer.serialize_unit_variant(UNIT_NAME, 0, HX_SWAP_INNER_HTML),
+            Self::OuterHtml => serializer.serialize_unit_variant(UNIT_NAME, 1, HX_SWAP_OUTER_HTML),
+            Self::BeforeBegin => {
+                serializer.serialize_unit_variant(UNIT_NAME, 2, HX_SWAP_BEFORE_BEGIN)
+            }
+            Self::AfterBegin => {
+                serializer.serialize_unit_variant(UNIT_NAME, 3, HX_SWAP_AFTER_BEGIN)
+            }
+            Self::BeforeEnd => serializer.serialize_unit_variant(UNIT_NAME, 4, HX_SWAP_BEFORE_END),
+            Self::AfterEnd => serializer.serialize_unit_variant(UNIT_NAME, 5, HX_SWAP_AFTER_END),
+            Self::Delete => serializer.serialize_unit_variant(UNIT_NAME, 6, HX_SWAP_DELETE),
+            Self::None => serializer.serialize_unit_variant(UNIT_NAME, 7, HX_SWAP_NONE),
+        }
+    }
+}
+
 impl From<SwapOption> for HeaderValue {
     fn from(value: SwapOption) -> Self {
         match value {
@@ -364,44 +306,6 @@ impl From<SwapOption> for HeaderValue {
             SwapOption::AfterEnd => HeaderValue::from_static(HX_SWAP_AFTER_END),
             SwapOption::Delete => HeaderValue::from_static(HX_SWAP_DELETE),
             SwapOption::None => HeaderValue::from_static(HX_SWAP_NONE),
-        }
-    }
-}
-
-#[derive(Debug)]
-pub enum HxError {
-    InvalidHeaderValue(InvalidHeaderValue),
-
-    #[cfg(feature = "serde")]
-    Serialization(serde_json::Error),
-}
-
-impl From<InvalidHeaderValue> for HxError {
-    fn from(value: InvalidHeaderValue) -> Self {
-        Self::InvalidHeaderValue(value)
-    }
-}
-
-#[cfg(feature = "serde")]
-impl From<serde_json::Error> for HxError {
-    fn from(value: serde_json::Error) -> Self {
-        Self::Serialization(value)
-    }
-}
-
-impl IntoResponse for HxError {
-    fn into_response(self) -> axum_core::response::Response {
-        match self {
-            Self::InvalidHeaderValue(_) => {
-                (StatusCode::INTERNAL_SERVER_ERROR, "invalid header value").into_response()
-            }
-
-            #[cfg(feature = "serde")]
-            Self::Serialization(_) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "failed to serialize event",
-            )
-                .into_response(),
         }
     }
 }
