@@ -12,7 +12,7 @@ There are some several breaking changes in this release. Big thanks to
   `HxResponseTrigger::normal`,
   `HxResponseTrigger::after_settle`, and
   `HxResponseTrigger::after_swap`.
-- The `HxCurrentUrl` extractor now returns an `Option<axum::http::Uri` instead
+- The `HxCurrentUrl` extractor now returns an `Option<axum::http::Uri>` instead
   of a `String`. If the Uri cannot be parsed, it will return `None`.
 - All Uri-related responders now impl `TryFrom<&str>`.
 - `HxError::Serialization` has been renamed to `HxError::Json`.
