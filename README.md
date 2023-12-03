@@ -13,10 +13,8 @@
 <!-- markdownlint-enable -->
 
 `axum-htmx` is a small extension library providing extractors, responders, and
- request guards for all [htmx](https://htmx.org/) headers within
- [axum](https://github.com/tokio-rs/axum). Additionally, the library exports
- const values for all of the htmx headers, so there's no need to mess with
- strings in your handlers.
+ request guards for [htmx](https://htmx.org/) headers within
+ [axum](https://github.com/tokio-rs/axum).
 
 ## Table of Contents
 
@@ -36,7 +34,7 @@
 
 ## Getting Started
 
-Simply run `cargo add axum-htmx` to add the library to your project.
+Run `cargo add axum-htmx` to add the library to your project.
 
 ## Extractors
 
@@ -140,8 +138,8 @@ async fn index() -> (&'static str, HxResponseTrigger) {
 }
 ```
 
-`htmx` also allows arbitrary data to be sent along with the event, which we
-can use via the `serde` feature flag and the `HxEvent` type.
+`htmx` also allows arbitrary data to be sent along with the event, which we can
+use via the `serde` feature flag and the `HxEvent` type.
 
 ```rust
 use serde_json::json;
