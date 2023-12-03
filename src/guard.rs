@@ -63,7 +63,7 @@ where
 {
     type Response = S::Response;
     type Error = S::Error;
-    type Future = ResponseFuture<'a, S::Future>;
+    type Future = private::ResponseFuture<'a, S::Future>;
 
     fn poll_ready(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
         self.inner.poll_ready(cx)
@@ -77,7 +77,7 @@ where
 
         let response_future = self.inner.call(req);
 
-        ResponseFuture {
+        private::ResponseFuture {
             response_future,
             hx_request: self.hx_request,
             layer: self.layer.clone(),
@@ -85,36 +85,40 @@ where
     }
 }
 
-pin_project! {
-    pub struct ResponseFuture<'a, F> {
-        #[pin]
-        response_future: F,
-        hx_request: bool,
-        layer: HxRequestGuardLayer<'a>,
+mod private {
+    use super::*;
+
+    pin_project! {
+        pub struct ResponseFuture<'a, F> {
+            #[pin]
+            pub(super) response_future: F,
+            pub(super) hx_request: bool,
+            pub(super) layer: HxRequestGuardLayer<'a>,
+        }
     }
-}
 
-impl<'a, F, B, E> Future for ResponseFuture<'a, F>
-where
-    F: Future<Output = Result<Response<B>, E>>,
-    B: Default,
-{
-    type Output = Result<Response<B>, E>;
+    impl<'a, F, B, E> Future for ResponseFuture<'a, F>
+    where
+        F: Future<Output = Result<Response<B>, E>>,
+        B: Default,
+    {
+        type Output = Result<Response<B>, E>;
 
-    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        let this = self.project();
-        let response: Response<B> = ready!(this.response_future.poll(cx))?;
+        fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+            let this = self.project();
+            let response: Response<B> = ready!(this.response_future.poll(cx))?;
 
-        match *this.hx_request {
-            true => Poll::Ready(Ok(response)),
-            false => {
-                let res = Response::builder()
-                    .status(StatusCode::SEE_OTHER)
-                    .header(LOCATION, this.layer.redirect_to)
-                    .body(B::default())
-                    .expect("failed to build response");
+            match *this.hx_request {
+                true => Poll::Ready(Ok(response)),
+                false => {
+                    let res = Response::builder()
+                        .status(StatusCode::SEE_OTHER)
+                        .header(LOCATION, this.layer.redirect_to)
+                        .body(B::default())
+                        .expect("failed to build response");
 
-                Poll::Ready(Ok(res))
+                    Poll::Ready(Ok(res))
+                }
             }
         }
     }
