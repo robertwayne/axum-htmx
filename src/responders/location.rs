@@ -27,6 +27,7 @@ pub struct HxLocation {
 }
 
 impl HxLocation {
+    /// Creates location from [`Uri`] without any options.
     pub fn from_uri(uri: Uri) -> Self {
         Self {
             #[cfg(feature = "serde")]
@@ -35,10 +36,34 @@ impl HxLocation {
         }
     }
 
+    /// Creates location from [`Uri`] and options.
     #[cfg(feature = "serde")]
     #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
     pub fn from_uri_with_options(uri: Uri, options: LocationOptions) -> Self {
         Self { uri, options }
+    }
+
+    /// Parses `uri` and sets it as location.
+    #[allow(clippy::should_implement_trait)]
+    pub fn from_str(uri: impl AsRef<str>) -> Result<Self, http::uri::InvalidUri> {
+        Ok(Self {
+            #[cfg(feature = "serde")]
+            options: LocationOptions::default(),
+            uri: uri.as_ref().parse::<Uri>()?,
+        })
+    }
+
+    /// Parses `uri` and sets it as location with additional options.
+    #[cfg(feature = "serde")]
+    #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
+    pub fn from_str_with_options(
+        uri: impl AsRef<str>,
+        options: LocationOptions,
+    ) -> Result<Self, http::uri::InvalidUri> {
+        Ok(Self {
+            options,
+            uri: uri.as_ref().parse::<Uri>()?,
+        })
     }
 
     #[cfg(feature = "serde")]
@@ -62,11 +87,35 @@ impl HxLocation {
     }
 }
 
+impl From<Uri> for HxLocation {
+    fn from(uri: Uri) -> Self {
+        Self::from_uri(uri)
+    }
+}
+
+#[cfg(feature = "serde")]
+#[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
+impl From<(Uri, LocationOptions)> for HxLocation {
+    fn from((uri, options): (Uri, LocationOptions)) -> Self {
+        Self::from_uri_with_options(uri, options)
+    }
+}
+
 impl<'a> TryFrom<&'a str> for HxLocation {
     type Error = <Uri as FromStr>::Err;
 
-    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
-        Ok(Self::from_uri(Uri::from_str(value)?))
+    fn try_from(uri: &'a str) -> Result<Self, Self::Error> {
+        Self::from_str(uri)
+    }
+}
+
+#[cfg(feature = "serde")]
+#[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
+impl<'a> TryFrom<(&'a str, LocationOptions)> for HxLocation {
+    type Error = <Uri as FromStr>::Err;
+
+    fn try_from((uri, options): (&'a str, LocationOptions)) -> Result<Self, Self::Error> {
+        Self::from_str_with_options(uri, options)
     }
 }
 
