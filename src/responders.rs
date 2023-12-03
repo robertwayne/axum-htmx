@@ -2,10 +2,10 @@
 
 use std::{convert::Infallible, str::FromStr};
 
-use axum_core::response::{IntoResponse, IntoResponseParts, ResponseParts};
-use http::{header::InvalidHeaderValue, HeaderValue, StatusCode, Uri};
+use axum_core::response::{IntoResponseParts, ResponseParts};
+use http::{HeaderValue, Uri};
 
-use crate::headers;
+use crate::{headers, HxError};
 
 mod location;
 pub use location::*;
@@ -306,46 +306,6 @@ impl From<SwapOption> for HeaderValue {
             SwapOption::AfterEnd => HeaderValue::from_static(HX_SWAP_AFTER_END),
             SwapOption::Delete => HeaderValue::from_static(HX_SWAP_DELETE),
             SwapOption::None => HeaderValue::from_static(HX_SWAP_NONE),
-        }
-    }
-}
-
-#[derive(Debug)]
-pub enum HxError {
-    InvalidHeaderValue(InvalidHeaderValue),
-
-    #[cfg(feature = "serde")]
-    #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
-    Json(serde_json::Error),
-}
-
-impl From<InvalidHeaderValue> for HxError {
-    fn from(value: InvalidHeaderValue) -> Self {
-        Self::InvalidHeaderValue(value)
-    }
-}
-
-#[cfg(feature = "serde")]
-#[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
-impl From<serde_json::Error> for HxError {
-    fn from(value: serde_json::Error) -> Self {
-        Self::Json(value)
-    }
-}
-
-impl IntoResponse for HxError {
-    fn into_response(self) -> axum_core::response::Response {
-        match self {
-            Self::InvalidHeaderValue(_) => {
-                (StatusCode::INTERNAL_SERVER_ERROR, "invalid header value").into_response()
-            }
-
-            #[cfg(feature = "serde")]
-            Self::Json(_) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "failed to serialize event",
-            )
-                .into_response(),
         }
     }
 }

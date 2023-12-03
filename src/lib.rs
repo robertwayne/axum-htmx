@@ -2,6 +2,9 @@
 #![doc = include_str!("../README.md")]
 #![forbid(unsafe_code)]
 
+mod error;
+pub use error::*;
+
 pub mod extractors;
 #[cfg(feature = "guards")]
 #[cfg_attr(feature = "unstable", doc(cfg(feature = "guards")))]
