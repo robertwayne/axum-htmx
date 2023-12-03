@@ -91,24 +91,53 @@ fn events_to_header_value(events: Vec<HxEvent>) -> Result<http::HeaderValue, HxE
     HeaderValue::from_maybe_shared(header_value).map_err(HxError::from)
 }
 
-/// The `HX-Trigger` header.
+/// Describes when should event be triggered.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum TriggerMode {
+    Normal,
+    AfterSettle,
+    AfterSwap,
+}
+
+/// The `HX-Trigger*` header.
 ///
 /// Allows you to trigger client-side events.
+/// Corresponds to `HX-Trigger`, `HX-Trigger-After-Settle` and `HX-Trigger-After-Swap` headers.
+/// To change when events trigger use appropriate `mode`.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
 /// visible ASCII (32-127) when serializing to JSON.
 ///
 /// See <https://htmx.org/headers/hx-trigger/> for more information.
 #[derive(Debug, Clone)]
-pub struct HxResponseTrigger(pub Vec<HxEvent>);
+pub struct HxResponseTrigger {
+    pub mode: TriggerMode,
+    pub events: Vec<HxEvent>,
+}
 
-impl<T> From<T> for HxResponseTrigger
-where
-    T: IntoIterator,
-    T::Item: Into<HxEvent>,
-{
-    fn from(value: T) -> Self {
-        Self(value.into_iter().map(Into::into).collect())
+impl HxResponseTrigger {
+    /// Creates new [trigger](https://htmx.org/headers/hx-trigger/) with specified mode and events.
+    pub fn new<T: Into<HxEvent>>(mode: TriggerMode, events: impl IntoIterator<Item = T>) -> Self {
+        Self {
+            mode,
+            events: events.into_iter().map(Into::into).collect(),
+        }
+    }
+
+    /// Creates new [normal](https://htmx.org/headers/hx-trigger/) trigger from events.
+    pub fn normal<T: Into<HxEvent>>(events: impl IntoIterator<Item = T>) -> Self {
+        Self::new(TriggerMode::Normal, events)
+    }
+
+    /// Creates new [after settle](https://htmx.org/headers/hx-trigger/) trigger from events.
+    pub fn after_settle<T: Into<HxEvent>>(events: impl IntoIterator<Item = T>) -> Self {
+        Self::new(TriggerMode::AfterSettle, events)
+    }
+
+    /// Creates new [after swap](https://htmx.org/headers/hx-trigger/) trigger from events.
+    pub fn after_swap<T: Into<HxEvent>>(events: impl IntoIterator<Item = T>) -> Self {
+        Self::new(TriggerMode::AfterSwap, events)
     }
 }
 
@@ -116,77 +145,15 @@ impl IntoResponseParts for HxResponseTrigger {
     type Error = HxError;
 
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
-        if !self.0.is_empty() {
+        if !self.events.is_empty() {
+            let header = match self.mode {
+                TriggerMode::Normal => headers::HX_TRIGGER,
+                TriggerMode::AfterSettle => headers::HX_TRIGGER_AFTER_SETTLE,
+                TriggerMode::AfterSwap => headers::HX_TRIGGER_AFTER_SETTLE,
+            };
+
             res.headers_mut()
-                .insert(headers::HX_TRIGGER, events_to_header_value(self.0)?);
-        }
-
-        Ok(res)
-    }
-}
-
-/// The `HX-Trigger-After-Settle` header.
-///
-/// Allows you to trigger client-side events after the settle step.
-///
-/// Will fail if the supplied events contain or produce characters that are not
-/// visible ASCII (32-127) when serializing to JSON.
-///
-/// See <https://htmx.org/headers/hx-trigger/> for more information.
-#[derive(Debug, Clone)]
-pub struct HxResponseTriggerAfterSettle(pub Vec<HxEvent>);
-
-impl<T> From<T> for HxResponseTriggerAfterSettle
-where
-    T: IntoIterator,
-    T::Item: Into<HxEvent>,
-{
-    fn from(value: T) -> Self {
-        Self(value.into_iter().map(Into::into).collect())
-    }
-}
-
-impl IntoResponseParts for HxResponseTriggerAfterSettle {
-    type Error = HxError;
-
-    fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
-        if !self.0.is_empty() {
-            res.headers_mut()
-                .insert(headers::HX_TRIGGER, events_to_header_value(self.0)?);
-        }
-
-        Ok(res)
-    }
-}
-
-/// The `HX-Trigger-After-Swap` header.
-///
-/// Allows you to trigger client-side events after the swap step.
-///
-/// Will fail if the supplied events contain or produce characters that are not
-/// visible ASCII (32-127) when serializing to JSON.
-///
-/// See <https://htmx.org/headers/hx-trigger/> for more information.
-#[derive(Debug, Clone)]
-pub struct HxResponseTriggerAfterSwap(pub Vec<HxEvent>);
-
-impl<T> From<T> for HxResponseTriggerAfterSwap
-where
-    T: IntoIterator,
-    T::Item: Into<HxEvent>,
-{
-    fn from(value: T) -> Self {
-        Self(value.into_iter().map(Into::into).collect())
-    }
-}
-
-impl IntoResponseParts for HxResponseTriggerAfterSwap {
-    type Error = HxError;
-
-    fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
-        if !self.0.is_empty() {
-            res.headers_mut()
-                .insert(headers::HX_TRIGGER, events_to_header_value(self.0)?);
+                .insert(header, events_to_header_value(self.events)?);
         }
 
         Ok(res)
@@ -217,7 +184,8 @@ mod tests {
 
         assert_eq!(header_value, HeaderValue::from_static(expected_value));
 
-        let value = events_to_header_value(HxResponseTrigger::from(["foo", "bar"]).0).unwrap();
+        let value =
+            events_to_header_value(HxResponseTrigger::normal(["foo", "bar"]).events).unwrap();
         assert_eq!(value, HeaderValue::from_static("foo, bar"));
     }
 }

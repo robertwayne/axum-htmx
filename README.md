@@ -74,9 +74,9 @@ any of your responses.
 | `HX-Reswap`               | `HxReswap`                     | `axum_htmx::responders::SwapOption`      |
 | `HX-Retarget`             | `HxRetarget`                   | `String`                                 |
 | `HX-Reselect`             | `HxReselect`                   | `String`                                 |
-| `HX-Trigger`              | `HxResponseTrigger`            | `axum_htmx::serde::HxEvent` |
-| `HX-Trigger-After-Settle` | `HxResponseTriggerAfterSettle` | `axum_htmx::serde::HxEvent` |
-| `HX-Trigger-After-Swap`   | `HxResponseTriggerAfterSwap`   | `axum_htmx::serde::HxEvent` |
+| `HX-Trigger`              | `HxResponseTrigger`            | `axum_htmx::serde::HxEvent`              |
+| `HX-Trigger-After-Settle` | `HxResponseTrigger`            | `axum_htmx::serde::HxEvent`              |
+| `HX-Trigger-After-Swap`   | `HxResponseTrigger`            | `axum_htmx::serde::HxEvent`              |
 
 ## Request Guards
 
