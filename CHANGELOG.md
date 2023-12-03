@@ -2,16 +2,25 @@
 
 ## v0.5.0
 
-- Add `From` impls for `HxResponseTrigger`, `HxResponseTriggerAfterSettle`, and
-  `HxResponseTriggerAfterSwap`, allowing them to take any iterator where `T:
-  Into<String>`.
-- Added feature flag badges to docs.rs pages. Thanks to
-  [@ItsEthra](https://github.com/ItsEthra).
-  ([#7](https://github.com/robertwayne/axum-htmx/pull/7))
+There are some several breaking changes in this release. Big thanks to
+[@ItsEthra](https://github.com/ItsEthra) for their work in several PRs!
+
+- All responders now take an `HxEvent` instead of a `String | HxEvent`. When the
+  `serde` flag is enabled, it will expose additional data fields.
+- `HxResponseTrigger` is now a simple struct containing an `TriggerMode` and a
+  `Vec<HxEvent>`. There are several methods to make constructing these easier:
+  `HxResponseTrigger::normal`,
+  `HxResponseTrigger::after_settle`, and
+  `HxResponseTrigger::after_swap`.
+- The `HxCurrentUrl` extractor now returns an `Option<axum::http::Uri` instead
+  of a `String`. If the Uri cannot be parsed, it will return `None`.
+- All Uri-related responders now impl `TryFrom<&str>`.
+- `HxError::Serialization` has been renamed to `HxError::Json`.
+- The `HxResponseTrigger*` header will not be added to the response if the event
+  list is empty.
+- Added feature flag badges and made additional updates to the docs.rs pages.
 - Reduced dependency count / compile time by swapping `axum` out for the
-`axum-core`, `async-trait`, and `http` crates. Thanks to
-  [@ItsEthra](https://github.com/ItsEthra) for their work on this!
-  ([#8](https://github.com/robertwayne/axum-htmx/pull/8))
+`axum-core`, `async-trait`, and `http` crates.
 
 ## v0.4.0
 
