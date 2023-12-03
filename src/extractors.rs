@@ -42,8 +42,8 @@ where
 /// This is set on every request made by htmx itself. As its name implies, it
 /// just contains the current url.
 ///
-/// This extractor will always return a value. If the header is not present, or extractor fails to parse the url
-/// it will return `None`.
+/// This extractor will always return a value. If the header is not present, or
+/// extractor fails to parse the url it will return `None`.
 #[derive(Debug, Clone)]
 pub struct HxCurrentUrl(pub Option<http::Uri>);
 
@@ -60,7 +60,7 @@ where
                 .to_str()
                 .ok()
                 .and_then(|url| url.parse::<http::Uri>().ok());
-            
+
             return Ok(HxCurrentUrl(url));
         }
 
@@ -70,8 +70,8 @@ where
 
 /// The `HX-History-Restore-Request` header.
 ///
-/// This extractor will always return a value. If the header is not present,
-/// it will return `false`.
+/// This extractor will always return a value. If the header is not present, it
+/// will return `false`.
 #[derive(Debug, Clone, Copy)]
 pub struct HxHistoryRestoreRequest(pub bool);
 
@@ -148,8 +148,8 @@ where
 /// The `HX-Target` header.
 ///
 /// This is set when a request is made from an element that has the `hx-target`
-/// attribute set. The value will contain the target element's id. If the
-/// id does not exist on the page, the value will be None.
+/// attribute set. The value will contain the target element's id. If the id
+/// does not exist on the page, the value will be None.
 ///
 /// This extractor will always return a value. If the header is not present, it
 /// will return `None`.
@@ -206,8 +206,8 @@ where
 /// The `HX-Trigger` header.
 ///
 /// This is set when a request is made from an element that has the `hx-trigger`
-/// attribute set. The value will contain the trigger element's id. If the
-/// id does not exist on the page, the value will be None.
+/// attribute set. The value will contain the trigger element's id. If the id
+/// does not exist on the page, the value will be None.
 ///
 /// This extractor will always return a value. If the header is not present, it
 /// will return `None`.

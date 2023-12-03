@@ -103,9 +103,9 @@ pub enum TriggerMode {
 
 /// The `HX-Trigger*` header.
 ///
-/// Allows you to trigger client-side events.
-/// Corresponds to `HX-Trigger`, `HX-Trigger-After-Settle` and `HX-Trigger-After-Swap` headers.
-/// To change when events trigger use appropriate `mode`.
+/// Allows you to trigger client-side events. Corresponds to `HX-Trigger`,
+/// `HX-Trigger-After-Settle` and `HX-Trigger-After-Swap` headers. To change
+/// when events trigger use appropriate `mode`.
 ///
 /// Will fail if the supplied events contain or produce characters that are not
 /// visible ASCII (32-127) when serializing to JSON.
@@ -118,7 +118,8 @@ pub struct HxResponseTrigger {
 }
 
 impl HxResponseTrigger {
-    /// Creates new [trigger](https://htmx.org/headers/hx-trigger/) with specified mode and events.
+    /// Creates new [trigger](https://htmx.org/headers/hx-trigger/) with
+    /// specified mode and events.
     pub fn new<T: Into<HxEvent>>(mode: TriggerMode, events: impl IntoIterator<Item = T>) -> Self {
         Self {
             mode,
@@ -126,17 +127,20 @@ impl HxResponseTrigger {
         }
     }
 
-    /// Creates new [normal](https://htmx.org/headers/hx-trigger/) trigger from events.
+    /// Creates new [normal](https://htmx.org/headers/hx-trigger/) trigger from
+    /// events.
     pub fn normal<T: Into<HxEvent>>(events: impl IntoIterator<Item = T>) -> Self {
         Self::new(TriggerMode::Normal, events)
     }
 
-    /// Creates new [after settle](https://htmx.org/headers/hx-trigger/) trigger from events.
+    /// Creates new [after settle](https://htmx.org/headers/hx-trigger/) trigger
+    /// from events.
     pub fn after_settle<T: Into<HxEvent>>(events: impl IntoIterator<Item = T>) -> Self {
         Self::new(TriggerMode::AfterSettle, events)
     }
 
-    /// Creates new [after swap](https://htmx.org/headers/hx-trigger/) trigger from events.
+    /// Creates new [after swap](https://htmx.org/headers/hx-trigger/) trigger
+    /// from events.
     pub fn after_swap<T: Into<HxEvent>>(events: impl IntoIterator<Item = T>) -> Self {
         Self::new(TriggerMode::AfterSwap, events)
     }

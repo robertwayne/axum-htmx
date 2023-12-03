@@ -83,7 +83,7 @@ impl HxLocation {
             path: self.uri.to_string(),
             opts: self.options,
         };
-        
+
         Ok(serde_json::to_string(&loc_with_opts)?)
     }
 }
@@ -147,7 +147,8 @@ impl IntoResponseParts for HxLocation {
 /// - `swap` - how the response will be swapped in relative to the target
 /// - `values` - values to submit with the request
 /// - `headers` - headers to submit with the request
-/// - `select` - allows you to select the content you want swapped from a response
+/// - `select` - allows you to select the content you want swapped from a
+///   response
 #[cfg(feature = "serde")]
 #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
 #[derive(Debug, Clone, serde::Serialize, Default)]
