@@ -111,6 +111,9 @@ pub enum TriggerMode {
 /// visible ASCII (32-127) when serializing to JSON.
 ///
 /// See <https://htmx.org/headers/hx-trigger/> for more information.
+///
+/// Note: An `HxResponseTrigger` implements `IntoResponseParts` and should be
+/// used before any other response object would consume the response parts.
 #[derive(Debug, Clone)]
 pub struct HxResponseTrigger {
     pub mode: TriggerMode,
@@ -129,18 +132,24 @@ impl HxResponseTrigger {
 
     /// Creates new [normal](https://htmx.org/headers/hx-trigger/) trigger from
     /// events.
+    ///
+    /// See `HxResponseTrigger` for more information.
     pub fn normal<T: Into<HxEvent>>(events: impl IntoIterator<Item = T>) -> Self {
         Self::new(TriggerMode::Normal, events)
     }
 
     /// Creates new [after settle](https://htmx.org/headers/hx-trigger/) trigger
     /// from events.
+    ///
+    /// See `HxResponseTrigger` for more information.
     pub fn after_settle<T: Into<HxEvent>>(events: impl IntoIterator<Item = T>) -> Self {
         Self::new(TriggerMode::AfterSettle, events)
     }
 
     /// Creates new [after swap](https://htmx.org/headers/hx-trigger/) trigger
     /// from events.
+    ///
+    /// See `HxResponseTrigger` for more information.
     pub fn after_swap<T: Into<HxEvent>>(events: impl IntoIterator<Item = T>) -> Self {
         Self::new(TriggerMode::AfterSwap, events)
     }

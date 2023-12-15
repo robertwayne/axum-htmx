@@ -130,10 +130,12 @@ trigger](https://htmx.org/attributes/hx-trigger/) header.
 use axum_htmx::HxResponseTrigger;
 
 // When we load our page, we will trigger any event listeners for "my-event.
-async fn index() -> (&'static str, HxResponseTrigger) {
+async fn index() -> (HxResponseTrigger, &'static str) {
+    // Note: As HxResponseTrigger only implements `IntoResponseParts`, we must
+    // return our trigger first here.
     (
-        "Hello, world!",
         HxResponseTrigger::normal(["my-event", "second-event"]),
+        "Hello, world!",
     )
 }
 ```
@@ -148,7 +150,7 @@ use serde_json::json;
 // instead of the root module.
 use axum_htmx::{HxEvent, HxResponseTrigger};
 
-async fn index() -> (&'static str, HxResponseTrigger) {
+async fn index() -> (HxResponseTrigger, &'static str) {
     let event = HxEvent::new_with_data(
         "my-event",
         // May be any object that implements `serde::Serialize`
@@ -159,7 +161,9 @@ async fn index() -> (&'static str, HxResponseTrigger) {
     )
     .unwrap();
 
-    ("Hello, world!", HxResponseTrigger::normal([event]))
+    // Note: As HxResponseTrigger only implements `IntoResponseParts`, we must
+    // return our trigger first here.
+    (HxResponseTrigger::normal([event]), "Hello, world!")
 }
 ```
 
