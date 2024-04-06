@@ -24,6 +24,7 @@
   - [Extractors](#extractors)
   - [Responders](#responders)
   - [Request Guards](#request-guards)
+  - [Macroses](#macroses)
   - [Examples](#examples)
     - [Example: Extractors](#example-extractors)
     - [Example: Responders](#example-responders)
@@ -88,6 +89,12 @@ _It should be noted that this is NOT a replacement for an auth guard. A user can
 trivially set the `HX-Request` header themselves. This is merely a convenience
 for preventing users from receiving partial responses without context. If you
 need to secure an endpoint you should be using a proper auth system._
+
+## Macroses
+
+__Requires features `macros`.__
+
+In addition to the HxBoosted extractor, the library provides macroses `hx_boosted_by` and it's async version `hx_boosted_by_async` for managing the response based on the presence of the `HX-Boosted` header.
 
 ## Examples
 
@@ -182,6 +189,26 @@ fn router_one() -> Router {
 fn router_two() -> Router {
     Router::new()
         .layer(HxRequestGuardLayer::new("/redirect-to-this-route"))
+}
+```
+
+### Example: Macros
+
+```rust
+use axum_htmx::hx_boosted_by;
+
+#[hx_boosted_by(with_layout)]
+async fn get_hello(Path(name): Path<String>) -> Html<String> {
+    Html(format!("Hello, {}!", name)
+}
+
+#[hx_boosted_by(with_layout)]
+async fn get_bye(Path(name): Path<String>) -> Html<String> {
+    Html(format!("Bye, {}!", name)
+}
+
+fn with_layout(Html(partial): Html<String>) -> Html<String> {
+    Html(format!("<html><body>{}</body></html>", partial))
 }
 ```
 
