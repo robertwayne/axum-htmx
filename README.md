@@ -92,7 +92,7 @@ need to secure an endpoint you should be using a proper auth system._
 
 ## Macroses
 
-__Requires features `macros`.__
+__Requires features `derive`.__
 
 In addition to the HxBoosted extractor, the library provides macroses `hx_boosted_by` and it's async version `hx_boosted_by_async` for managing the response based on the presence of the `HX-Boosted` header.
 
@@ -219,6 +219,7 @@ fn with_layout(Html(partial): Html<String>) -> Html<String> {
 |----------|----------|------------------------------------------------------------|---------------------------------------------|
 | `guards` | Disabled | Adds request guard layers.                                 | `tower`, `futures-core`, `pin-project-lite` |
 | `serde`  | Disabled | Adds serde support for the `HxEvent` and `LocationOptions` | `serde`, `serde_json`                       |
+| `derive` | Disabled | Adds the `hx_boosted_by` and `hx_boosted_by_async` macros. | `proc-macro-error`, `proc-macro2`, `quote`, `syn`     |
 <!-- markdownlint-enable -->
 
 ## Contributing
