@@ -199,12 +199,12 @@ use axum_htmx::hx_boosted_by;
 
 #[hx_boosted_by(with_layout)]
 async fn get_hello(Path(name): Path<String>) -> Html<String> {
-    Html(format!("Hello, {}!", name)
+    Html(format!("Hello, {}!", name))
 }
 
 #[hx_boosted_by(with_layout)]
 async fn get_bye(Path(name): Path<String>) -> Html<String> {
-    Html(format!("Bye, {}!", name)
+    Html(format!("Bye, {}!", name))
 }
 
 fn with_layout(Html(partial): Html<String>) -> Html<String> {
