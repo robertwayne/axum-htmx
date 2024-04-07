@@ -98,9 +98,7 @@ In addition to the HxBoosted extractor, the library provides macroses `hx_booste
 
 The macro input should have a `layout_fn`, and can have arguments passed from annotated function into `layout_fn`. The macro will call the `layout_fn` if the `HX-Boosted` header is not present, otherwise it will return the response directly.
 
-```rust
-#[hx_boosted_by(layout_fn, [arg1, agr2, ...])]
-```
+`#[hx_boosted_by(layout_fn [, arg1, agr2, ...])]`
 
 If `layout_fn` is an async function, use `hx_boosted_by_async` instead.
 
@@ -203,6 +201,8 @@ fn router_two() -> Router {
 ### Example: Macros
 
 ```rust
+use axum::extract::Path;
+use axum::response::Html;
 use axum_htmx::hx_boosted_by;
 
 #[hx_boosted_by(with_layout, page_title)]

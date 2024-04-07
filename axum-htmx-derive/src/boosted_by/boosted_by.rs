@@ -76,21 +76,24 @@ pub fn transform_using_template(input: MacroInput, template_fn: ItemFn) -> ItemF
     source_fn.sig.inputs.push(hx_boosted_input);
 
     // pop the last statement and wrap it with if-else
-    let modify_stmt = source_fn.block.stmts.pop().unwrap();
-    let modify_stmt = quote!(#modify_stmt).to_string();
-    let modify_args = input.fn_args.join("");
+    let source_stmt = source_fn.block.stmts.pop().unwrap();
+    let source_stmt = quote!(#source_stmt).to_string();
 
     let new_fn_str = quote!(#template_fn)
         .to_string()
         .replace("layout_fn", input.layout_fn.as_str())
-        .replace("result_boosted", modify_stmt.as_str())
-        .replace("result_with_layout", modify_stmt.as_str())
-        .replace(", fn_args", modify_args.as_str());
+        .replace("result_boosted", source_stmt.as_str())
+        .replace("result_with_layout", source_stmt.as_str());
 
+    // add layout_args
+    let layout_args = input.fn_args.join("");
+    let new_fn_str = new_fn_str.replace(", fn_args", layout_args.as_str());
+
+    // parse new_fn_str as ItemFn
     let new_fn: ItemFn = parse_str(new_fn_str.as_str()).unwrap();
-    let new_fn_stmt = new_fn.block.stmts.first().unwrap().clone();
 
     // push the new statement to source_fn
+    let new_fn_stmt = new_fn.block.stmts.first().unwrap().clone();
     source_fn.block.stmts.push(new_fn_stmt);
 
     source_fn.to_owned()
