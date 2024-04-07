@@ -96,6 +96,14 @@ __Requires features `derive`.__
 
 In addition to the HxBoosted extractor, the library provides macroses `hx_boosted_by` and it's async version `hx_boosted_by_async` for managing the response based on the presence of the `HX-Boosted` header.
 
+The macro input should have a `layout_fn` and can have arguments passed from annotated function into `layout_fn`. The macro will call the layout_fn with if the `HX-Boosted` header is not present, otherwise it will return the response directly.
+
+```rust
+#[hx_boosted_by(layout_fn, [arg1, agr2, ...])]
+```
+
+If `layout_fn` is an async function, use `hx_boosted_by_async` instead.
+
 ## Examples
 
 ### Example: Extractors
@@ -197,18 +205,20 @@ fn router_two() -> Router {
 ```rust
 use axum_htmx::hx_boosted_by;
 
-#[hx_boosted_by(with_layout)]
+#[hx_boosted_by(with_layout, page_title)]
 async fn get_hello(Path(name): Path<String>) -> Html<String> {
+    let page_title = "Hello Page";
     Html(format!("Hello, {}!", name))
 }
 
-#[hx_boosted_by(with_layout)]
+#[hx_boosted_by(with_layout, page_title)]
 async fn get_bye(Path(name): Path<String>) -> Html<String> {
+    let page_title = "Bye Page";
     Html(format!("Bye, {}!", name))
 }
 
-fn with_layout(Html(partial): Html<String>) -> Html<String> {
-    Html(format!("<html><body>{}</body></html>", partial))
+fn with_layout(Html(partial): Html<String>, page_title: &str) -> Html<String> {
+    Html(format!("<html><head><title>{}</title></head><body>{}</body></html>", page_title, partial))
 }
 ```
 
