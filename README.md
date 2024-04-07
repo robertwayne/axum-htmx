@@ -96,7 +96,7 @@ __Requires features `derive`.__
 
 In addition to the HxBoosted extractor, the library provides macroses `hx_boosted_by` and it's async version `hx_boosted_by_async` for managing the response based on the presence of the `HX-Boosted` header.
 
-The macro input should have a `layout_fn` and can have arguments passed from annotated function into `layout_fn`. The macro will call the layout_fn with if the `HX-Boosted` header is not present, otherwise it will return the response directly.
+The macro input should have a `layout_fn` and can have arguments passed from annotated function into `layout_fn`. The macro will call the layout_fn if the `HX-Boosted` header is not present, otherwise it will return the response directly.
 
 ```rust
 #[hx_boosted_by(layout_fn, [arg1, agr2, ...])]
