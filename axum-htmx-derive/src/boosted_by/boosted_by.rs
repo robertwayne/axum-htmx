@@ -73,7 +73,7 @@ pub fn transform_using_template(input: MacroInput, template_fn: ItemFn) -> ItemF
 
     // add HxBoosted input to source_fn
     let hx_boosted_input = template_fn.sig.inputs.first().unwrap().clone();
-    source_fn.sig.inputs.push(hx_boosted_input);
+    source_fn.sig.inputs.insert(0, hx_boosted_input);
 
     // pop the last statement and wrap it with if-else
     let source_stmt = source_fn.block.stmts.pop().unwrap();

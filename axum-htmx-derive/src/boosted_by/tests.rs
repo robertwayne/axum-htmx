@@ -17,7 +17,7 @@ fn boosted_by() {
         }
     };
     let expected = quote! {
-        async fn index(Path(user_id): Path<u32>, axum_htmx::HxBoosted(boosted): axum_htmx::HxBoosted) -> Html<String> {
+        async fn index(axum_htmx::HxBoosted(boosted): axum_htmx::HxBoosted, Path(user_id): Path<u32>) -> Html<String> {
             let ctx = HomeTemplate {
                 locale: "en".to_string(),
             };
