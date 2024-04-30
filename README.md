@@ -76,6 +76,25 @@ any of your responses.
 | `HX-Trigger-After-Settle` | `HxResponseTrigger` | `axum_htmx::serde::HxEvent`         |
 | `HX-Trigger-After-Swap`   | `HxResponseTrigger` | `axum_htmx::serde::HxEvent`         |
 
+Also, there are corresponding cache-related headers, which you may want to add to
+`GET` responses, depending on the htmx headers.
+
+_For example, if your server renders the full HTML when the `HX-Request` header is
+missing or `false`, and it renders a fragment of that HTML when `HX-Request: true`,
+you need to add `Vary: HX-Request`. That causes the cache to be keyed based on a
+composite of the response URL and the `HX-Request` request header - rather than
+being based just on the response URL._
+
+Refer to [caching htmx docs section](https://htmx.org/docs/#caching) for details.
+
+| Header                  | Responder           |
+|-------------------------|---------------------|
+| `Vary: HX-Request`      | `VaryHxRequest`     |
+| `Vary: HX-Target`       | `VaryHxTarget`      |
+| `Vary: HX-Trigger`      | `VaryHxTrigger`     |
+| `Vary: HX-Trigger-Name` | `VaryHxTriggerName` |
+
+
 ## Request Guards
 
 __Requires features `guards`.__
