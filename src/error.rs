@@ -1,11 +1,15 @@
 use std::{error, fmt};
 
 use axum_core::response::IntoResponse;
-use http::{header::InvalidHeaderValue, StatusCode};
+use http::{
+    header::{InvalidHeaderValue, MaxSizeReached},
+    StatusCode,
+};
 
 #[derive(Debug)]
 pub enum HxError {
     InvalidHeaderValue(InvalidHeaderValue),
+    TooManyResponseHeaders(MaxSizeReached),
 
     #[cfg(feature = "serde")]
     #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
@@ -15,6 +19,12 @@ pub enum HxError {
 impl From<InvalidHeaderValue> for HxError {
     fn from(value: InvalidHeaderValue) -> Self {
         Self::InvalidHeaderValue(value)
+    }
+}
+
+impl From<MaxSizeReached> for HxError {
+    fn from(value: MaxSizeReached) -> Self {
+        Self::TooManyResponseHeaders(value)
     }
 }
 
@@ -30,6 +40,7 @@ impl fmt::Display for HxError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             HxError::InvalidHeaderValue(err) => write!(f, "Invalid header value: {err}"),
+            HxError::TooManyResponseHeaders(err) => write!(f, "Too many response headers: {err}"),
             #[cfg(feature = "serde")]
             HxError::Json(err) => write!(f, "Json: {err}"),
         }

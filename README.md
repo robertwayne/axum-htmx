@@ -219,6 +219,12 @@ Contributions are always welcome! If you have an idea for a feature or find a
 bug, let me know. PR's are appreciated, but if it's not a small change, please
 open an issue first so we're all on the same page!
 
+### Testing
+
+```sh
+cargo +nightly test --all-features
+```
+
 ## License
 
 `axum-htmx` is dual-licensed under either
