@@ -39,15 +39,24 @@ impl From<serde_json::Error> for HxError {
 impl fmt::Display for HxError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            HxError::InvalidHeaderValue(err) => write!(f, "Invalid header value: {err}"),
-            HxError::TooManyResponseHeaders(err) => write!(f, "Too many response headers: {err}"),
+            HxError::InvalidHeaderValue(_) => write!(f, "Invalid header value"),
+            HxError::TooManyResponseHeaders(_) => write!(f, "Too many response headers"),
             #[cfg(feature = "serde")]
-            HxError::Json(err) => write!(f, "Json: {err}"),
+            HxError::Json(_) => write!(f, "Json"),
         }
     }
 }
 
-impl error::Error for HxError {}
+impl error::Error for HxError {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        match self {
+            HxError::InvalidHeaderValue(ref e) => Some(e),
+            HxError::TooManyResponseHeaders(ref e) => Some(e),
+            #[cfg(feature = "serde")]
+            HxError::Json(ref e) => Some(e),
+        }
+    }
+}
 
 impl IntoResponse for HxError {
     fn into_response(self) -> axum_core::response::Response {
