@@ -1,11 +1,15 @@
 use std::{error, fmt};
 
 use axum_core::response::IntoResponse;
-use http::{header::InvalidHeaderValue, StatusCode};
+use http::{
+    header::{InvalidHeaderValue, MaxSizeReached},
+    StatusCode,
+};
 
 #[derive(Debug)]
 pub enum HxError {
     InvalidHeaderValue(InvalidHeaderValue),
+    TooManyResponseHeaders(MaxSizeReached),
 
     #[cfg(feature = "serde")]
     #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
@@ -15,6 +19,12 @@ pub enum HxError {
 impl From<InvalidHeaderValue> for HxError {
     fn from(value: InvalidHeaderValue) -> Self {
         Self::InvalidHeaderValue(value)
+    }
+}
+
+impl From<MaxSizeReached> for HxError {
+    fn from(value: MaxSizeReached) -> Self {
+        Self::TooManyResponseHeaders(value)
     }
 }
 
@@ -30,6 +40,7 @@ impl fmt::Display for HxError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             HxError::InvalidHeaderValue(_) => write!(f, "Invalid header value"),
+            HxError::TooManyResponseHeaders(_) => write!(f, "Too many response headers"),
             #[cfg(feature = "serde")]
             HxError::Json(_) => write!(f, "Json"),
         }
@@ -40,6 +51,7 @@ impl error::Error for HxError {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match self {
             HxError::InvalidHeaderValue(ref e) => Some(e),
+            HxError::TooManyResponseHeaders(ref e) => Some(e),
             #[cfg(feature = "serde")]
             HxError::Json(ref e) => Some(e),
         }

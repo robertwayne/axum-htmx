@@ -11,6 +11,8 @@ mod location;
 pub use location::*;
 mod trigger;
 pub use trigger::*;
+mod vary;
+pub use vary::*;
 
 const HX_SWAP_INNER_HTML: &str = "innerHTML";
 const HX_SWAP_OUTER_HTML: &str = "outerHTML";
