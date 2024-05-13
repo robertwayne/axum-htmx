@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.6.0
+
+- Added support for Vary headers in responses via the `VaryHxRequest`, `VaryHxTarget`, `VaryHxTrigger`, and `VaryHxTriggerName` responders. [@imbolc](https://github.com/imbolc)
+- Header names/values are now typed as `HeaderName` and `HeaderValue` instead of
+  `&str`. [@imbolc](https://github.com/imbolc)
+- `HxError` now implements source on `error::Error`. [@imbolc](https://github.com/imbolc)
+
 ## v0.5.0
 
 There are some several breaking changes in this release. Big thanks to
