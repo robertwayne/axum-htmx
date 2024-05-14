@@ -1,15 +1,17 @@
-use crate::{
-    headers::{HX_REQUEST_STR, HX_TARGET_STR},
-    HxError,
-};
+use std::sync::Arc;
+
 use axum::{extract::Request, middleware::Next, response::Response};
 use axum_core::response::IntoResponse;
 use http::{
     header::{HeaderValue, VARY},
     Extensions,
 };
-use std::sync::Arc;
 use tokio::sync::oneshot::{self, Receiver, Sender};
+
+use crate::{
+    headers::{HX_REQUEST_STR, HX_TARGET_STR},
+    HxError,
+};
 
 const MIDDLEWARE_DOUBLE_USE: &str =
     "Configuration error: `axum_httpx::vary_middleware` is used twice";
@@ -91,10 +93,10 @@ pub async fn vary_middleware(mut request: Request, next: Next) -> Response {
 
 #[cfg(test)]
 mod tests {
-    use crate::{HxRequest, HxTarget};
     use axum::{routing::get, Router};
 
     use super::*;
+    use crate::{HxRequest, HxTarget};
 
     fn vary_headers(resp: &axum_test::TestResponse) -> Vec<HeaderValue> {
         resp.iter_headers_by_name("vary").cloned().collect()
