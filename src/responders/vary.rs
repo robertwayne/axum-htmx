@@ -1,12 +1,12 @@
 use axum_core::response::{IntoResponseParts, ResponseParts};
 use http::header::{HeaderValue, VARY};
 
-use crate::{extractors, HxError};
+use crate::{extractors, headers, HxError};
 
-const HX_REQUEST: HeaderValue = HeaderValue::from_static("hx-request");
-const HX_TARGET: HeaderValue = HeaderValue::from_static("hx-target");
-const HX_TRIGGER: HeaderValue = HeaderValue::from_static("hx-trigger");
-const HX_TRIGGER_NAME: HeaderValue = HeaderValue::from_static("hx-trigger-name");
+const HX_REQUEST: HeaderValue = HeaderValue::from_static(headers::HX_REQUEST_STR);
+const HX_TARGET: HeaderValue = HeaderValue::from_static(headers::HX_TARGET_STR);
+const HX_TRIGGER: HeaderValue = HeaderValue::from_static(headers::HX_TRIGGER_STR);
+const HX_TRIGGER_NAME: HeaderValue = HeaderValue::from_static(headers::HX_TRIGGER_NAME_STR);
 
 /// The `Vary: HX-Request` header.
 ///

@@ -20,14 +20,20 @@ pub const HX_HISTORY_RESTORE_REQUEST: HeaderName =
 /// See <https://htmx.org/attributes/hx-prompt/> for more information.
 pub const HX_PROMPT: HeaderName = HeaderName::from_static("hx-prompt");
 
+pub(crate) const HX_REQUEST_STR: &str = "hx-request";
+
 /// Always `true`.
-pub const HX_REQUEST: HeaderName = HeaderName::from_static("hx-request");
+pub const HX_REQUEST: HeaderName = HeaderName::from_static(HX_REQUEST_STR);
+
+pub(crate) const HX_TARGET_STR: &str = "hx-target";
 
 /// The `id` of the target element, if it exists.
-pub const HX_TARGET: HeaderName = HeaderName::from_static("hx-target");
+pub const HX_TARGET: HeaderName = HeaderName::from_static(HX_TARGET_STR);
+
+pub(crate) const HX_TRIGGER_NAME_STR: &str = "hx-trigger-name";
 
 /// The `name` of the triggered element, if it exists.
-pub const HX_TRIGGER_NAME: HeaderName = HeaderName::from_static("hx-trigger-name");
+pub const HX_TRIGGER_NAME: HeaderName = HeaderName::from_static(HX_TRIGGER_NAME_STR);
 
 /// Allows you to do a client-side redirect that does not do a full page reload.
 pub const HX_LOCATION: HeaderName = HeaderName::from_static("hx-location");
@@ -58,6 +64,8 @@ pub const HX_RETARGET: HeaderName = HeaderName::from_static("hx-retarget");
 /// element
 pub const HX_RESELECT: HeaderName = HeaderName::from_static("hx-reselect");
 
+pub(crate) const HX_TRIGGER_STR: &str = "hx-trigger";
+
 /// Can be set as a request or response header.
 ///
 /// In a request, it contains the `id` of the element that triggered the
@@ -66,7 +74,7 @@ pub const HX_RESELECT: HeaderName = HeaderName::from_static("hx-reselect");
 /// In a response, it can be used to trigger client-side events.
 ///
 /// See <https://htmx.org/headers/hx-trigger/> for more information.
-pub const HX_TRIGGER: HeaderName = HeaderName::from_static("hx-trigger");
+pub const HX_TRIGGER: HeaderName = HeaderName::from_static(HX_TRIGGER_STR);
 
 /// Allows you to trigger client-side events.
 ///
