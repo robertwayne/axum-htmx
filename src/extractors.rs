@@ -137,6 +137,12 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
+        use crate::vary_middleware::{HxRequestExtracted, Notifier};
+        parts
+            .extensions
+            .get_mut::<HxRequestExtracted>()
+            .map(Notifier::notify);
+
         if parts.headers.contains_key(HX_REQUEST) {
             return Ok(HxRequest(true));
         } else {
@@ -164,6 +170,12 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
+        use crate::vary_middleware::{HxTargetExtracted, Notifier};
+        parts
+            .extensions
+            .get_mut::<HxTargetExtracted>()
+            .map(Notifier::notify);
+
         if let Some(target) = parts.headers.get(HX_TARGET) {
             if let Ok(target) = target.to_str() {
                 return Ok(HxTarget(Some(target.to_string())));
