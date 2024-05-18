@@ -22,3 +22,7 @@ pub use guard::*;
 pub use headers::*;
 #[doc(inline)]
 pub use responders::*;
+
+#[cfg(feature = "derive")]
+#[cfg_attr(feature = "unstable", doc(cfg(feature = "derive")))]
+pub use axum_htmx_derive::*;

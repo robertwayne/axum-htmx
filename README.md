@@ -24,6 +24,7 @@
   - [Extractors](#extractors)
   - [Responders](#responders)
   - [Request Guards](#request-guards)
+  - [Macroses](#macroses)
   - [Examples](#examples)
     - [Example: Extractors](#example-extractors)
     - [Example: Responders](#example-responders)
@@ -107,6 +108,18 @@ _It should be noted that this is NOT a replacement for an auth guard. A user can
 trivially set the `HX-Request` header themselves. This is merely a convenience
 for preventing users from receiving partial responses without context. If you
 need to secure an endpoint you should be using a proper auth system._
+
+## Macroses
+
+__Requires features `derive`.__
+
+In addition to the HxBoosted extractor, the library provides macroses `hx_boosted_by` and it's async version `hx_boosted_by_async` for managing the response based on the presence of the `HX-Boosted` header.
+
+The macro input should have a `layout_fn`, and can have arguments passed from annotated function into `layout_fn`. The macro will call the `layout_fn` if the `HX-Boosted` header is not present, otherwise it will return the response directly.
+
+`#[hx_boosted_by(layout_fn [, arg1, agr2, ...])]`
+
+If `layout_fn` is an async function, use `hx_boosted_by_async` instead.
 
 ## Examples
 
@@ -204,6 +217,30 @@ fn router_two() -> Router {
 }
 ```
 
+### Example: Macros
+
+```rust
+use axum::extract::Path;
+use axum::response::Html;
+use axum_htmx::hx_boosted_by;
+
+#[hx_boosted_by(with_layout, page_title)]
+async fn get_hello(Path(name): Path<String>) -> Html<String> {
+    let page_title = "Hello Page";
+    Html(format!("Hello, {}!", name))
+}
+
+#[hx_boosted_by(with_layout, page_title)]
+async fn get_bye(Path(name): Path<String>) -> Html<String> {
+    let page_title = "Bye Page";
+    Html(format!("Bye, {}!", name))
+}
+
+fn with_layout(Html(partial): Html<String>, page_title: &str) -> Html<String> {
+    Html(format!("<html><head><title>{}</title></head><body>{}</body></html>", page_title, partial))
+}
+```
+
 ## Feature Flags
 
 <!-- markdownlint-disable -->
@@ -211,6 +248,7 @@ fn router_two() -> Router {
 |----------|----------|------------------------------------------------------------|---------------------------------------------|
 | `guards` | Disabled | Adds request guard layers.                                 | `tower`, `futures-core`, `pin-project-lite` |
 | `serde`  | Disabled | Adds serde support for the `HxEvent` and `LocationOptions` | `serde`, `serde_json`                       |
+| `derive` | Disabled | Adds the `hx_boosted_by` and `hx_boosted_by_async` macros. | `proc-macro-error`, `proc-macro2`, `quote`, `syn`     |
 <!-- markdownlint-enable -->
 
 ## Contributing
