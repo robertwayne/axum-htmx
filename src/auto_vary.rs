@@ -1,13 +1,19 @@
-use std::sync::Arc;
+use std::{
+    sync::Arc,
+    task::{Context, Poll},
+};
 
-use axum::{extract::Request, middleware::Next, response::Response};
-use axum_core::response::IntoResponse;
-use futures::future::join_all;
+use axum_core::{
+    extract::Request,
+    response::{IntoResponse, Response},
+};
+use futures::future::{join_all, BoxFuture};
 use http::{
     header::{HeaderValue, VARY},
     Extensions,
 };
 use tokio::sync::oneshot::{self, Receiver, Sender};
+use tower::{Layer, Service};
 
 use crate::{
     headers::{HX_REQUEST_STR, HX_TARGET_STR, HX_TRIGGER_NAME_STR, HX_TRIGGER_STR},
@@ -59,41 +65,72 @@ define_notifiers!(
     HxTriggerNameExtracted
 );
 
-pub async fn middleware(mut request: Request, next: Next) -> Response {
-    let exts = request.extensions_mut();
-    let rx_header = [
-        (HxRequestExtracted::insert(exts), HX_REQUEST_STR),
-        (HxTargetExtracted::insert(exts), HX_TARGET_STR),
-        (HxTriggerExtracted::insert(exts), HX_TRIGGER_STR),
-        (HxTriggerNameExtracted::insert(exts), HX_TRIGGER_NAME_STR),
-    ];
+#[derive(Default, Clone)]
+pub struct AutoVaryLayer;
 
-    let mut response = next.run(request).await;
+impl<S> Layer<S> for AutoVaryLayer {
+    type Service = AutoVaryMiddleware<S>;
 
-    let used_headers: Vec<_> = join_all(
-        rx_header
+    fn layer(&self, inner: S) -> Self::Service {
+        AutoVaryMiddleware { inner }
+    }
+}
+
+#[derive(Clone)]
+pub struct AutoVaryMiddleware<S> {
+    inner: S,
+}
+
+impl<S> Service<Request> for AutoVaryMiddleware<S>
+where
+    S: Service<Request, Response = Response> + Send + 'static,
+    S::Future: Send + 'static,
+{
+    type Response = S::Response;
+    type Error = S::Error;
+    type Future = BoxFuture<'static, Result<Self::Response, Self::Error>>;
+
+    fn poll_ready(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+        self.inner.poll_ready(cx)
+    }
+
+    fn call(&mut self, mut request: Request) -> Self::Future {
+        let exts = request.extensions_mut();
+        let rx_header = [
+            (HxRequestExtracted::insert(exts), HX_REQUEST_STR),
+            (HxTargetExtracted::insert(exts), HX_TARGET_STR),
+            (HxTriggerExtracted::insert(exts), HX_TRIGGER_STR),
+            (HxTriggerNameExtracted::insert(exts), HX_TRIGGER_NAME_STR),
+        ];
+        let future = self.inner.call(request);
+        Box::pin(async move {
+            let mut response: Response = future.await?;
+            let used_headers: Vec<_> = join_all(
+                rx_header
+                    .into_iter()
+                    .map(|(rx, header)| async move { rx.await.ok().map(|_| header) }),
+            )
+            .await
             .into_iter()
-            .map(|(rx, header)| async move { rx.await.ok().map(|_| header) }),
-    )
-    .await
-    .into_iter()
-    .flatten()
-    .collect();
+            .flatten()
+            .collect();
 
-    if used_headers.is_empty() {
-        return response;
+            if used_headers.is_empty() {
+                return Ok(response);
+            }
+
+            let value = match HeaderValue::from_str(&used_headers.join(", ")) {
+                Ok(x) => x,
+                Err(e) => return Ok(HxError::from(e).into_response()),
+            };
+
+            if let Err(e) = response.headers_mut().try_append(VARY, value) {
+                return Ok(HxError::from(e).into_response());
+            }
+
+            Ok(response)
+        })
     }
-
-    let value = match HeaderValue::from_str(&used_headers.join(", ")) {
-        Ok(x) => x,
-        Err(e) => return HxError::from(e).into_response(),
-    };
-
-    if let Err(e) = response.headers_mut().try_append(VARY, value) {
-        return HxError::from(e).into_response();
-    }
-
-    response
 }
 
 #[cfg(test)]
@@ -122,7 +159,7 @@ mod tests {
                 "/multiple-extractors",
                 get(|_: HxRequest, _: HxTarget, _: HxTrigger, _: HxTriggerName| async { () }),
             )
-            .layer(axum::middleware::from_fn(middleware));
+            .layer(AutoVaryLayer);
         axum_test::TestServer::new(app).unwrap()
     }
 
