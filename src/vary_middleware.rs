@@ -24,6 +24,8 @@ pub trait Notifier {
             sender.send(()).ok();
         }
     }
+
+    fn insert_into_extensions(extensions: &mut Extensions) -> Receiver<()>;
 }
 
 macro_rules! define_notifiers {
@@ -36,9 +38,7 @@ macro_rules! define_notifiers {
                 fn sender(&mut self) -> Option<Sender<()>> {
                     self.0.take().and_then(Arc::into_inner)
                 }
-            }
 
-            impl $name {
                 fn insert_into_extensions(extensions: &mut Extensions) -> Receiver<()> {
                     let (tx, rx) = oneshot::channel();
                     if extensions.insert(Self(Some(Arc::new(tx)))).is_some() {
