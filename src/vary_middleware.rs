@@ -16,18 +16,6 @@ use crate::{
 const MIDDLEWARE_DOUBLE_USE: &str =
     "Configuration error: `axum_httpx::vary_middleware` is used twice";
 
-#[derive(Clone)]
-pub(crate) struct HxRequestExtracted(Option<Arc<Sender<()>>>);
-
-#[derive(Clone)]
-pub(crate) struct HxTargetExtracted(Option<Arc<Sender<()>>>);
-
-#[derive(Clone)]
-pub(crate) struct HxTriggerExtracted(Option<Arc<Sender<()>>>);
-
-#[derive(Clone)]
-pub(crate) struct HxTriggerNameExtracted(Option<Arc<Sender<()>>>);
-
 pub trait Notifier {
     fn sender(&mut self) -> Option<Sender<()>>;
 
@@ -38,69 +26,37 @@ pub trait Notifier {
     }
 }
 
-impl Notifier for HxRequestExtracted {
-    fn sender(&mut self) -> Option<Sender<()>> {
-        self.0.take().and_then(Arc::into_inner)
+macro_rules! define_notifiers {
+    ($($name:ident),*) => {
+        $(
+            #[derive(Clone)]
+            pub(crate) struct $name(Option<Arc<Sender<()>>>);
+
+            impl Notifier for $name {
+                fn sender(&mut self) -> Option<Sender<()>> {
+                    self.0.take().and_then(Arc::into_inner)
+                }
+            }
+
+            impl $name {
+                fn insert_into_extensions(extensions: &mut Extensions) -> Receiver<()> {
+                    let (tx, rx) = oneshot::channel();
+                    if extensions.insert(Self(Some(Arc::new(tx)))).is_some() {
+                        panic!("{}", MIDDLEWARE_DOUBLE_USE);
+                    }
+                    rx
+                }
+            }
+        )*
     }
 }
 
-impl Notifier for HxTargetExtracted {
-    fn sender(&mut self) -> Option<Sender<()>> {
-        self.0.take().and_then(Arc::into_inner)
-    }
-}
-
-impl Notifier for HxTriggerExtracted {
-    fn sender(&mut self) -> Option<Sender<()>> {
-        self.0.take().and_then(Arc::into_inner)
-    }
-}
-
-impl Notifier for HxTriggerNameExtracted {
-    fn sender(&mut self) -> Option<Sender<()>> {
-        self.0.take().and_then(Arc::into_inner)
-    }
-}
-
-impl HxRequestExtracted {
-    fn insert_into_extensions(extensions: &mut Extensions) -> Receiver<()> {
-        let (tx, rx) = oneshot::channel();
-        if extensions.insert(Self(Some(Arc::new(tx)))).is_some() {
-            panic!("{}", MIDDLEWARE_DOUBLE_USE);
-        }
-        rx
-    }
-}
-
-impl HxTargetExtracted {
-    fn insert_into_extensions(extensions: &mut Extensions) -> Receiver<()> {
-        let (tx, rx) = oneshot::channel();
-        if extensions.insert(Self(Some(Arc::new(tx)))).is_some() {
-            panic!("{}", MIDDLEWARE_DOUBLE_USE);
-        }
-        rx
-    }
-}
-
-impl HxTriggerExtracted {
-    fn insert_into_extensions(extensions: &mut Extensions) -> Receiver<()> {
-        let (tx, rx) = oneshot::channel();
-        if extensions.insert(Self(Some(Arc::new(tx)))).is_some() {
-            panic!("{}", MIDDLEWARE_DOUBLE_USE);
-        }
-        rx
-    }
-}
-
-impl HxTriggerNameExtracted {
-    fn insert_into_extensions(extensions: &mut Extensions) -> Receiver<()> {
-        let (tx, rx) = oneshot::channel();
-        if extensions.insert(Self(Some(Arc::new(tx)))).is_some() {
-            panic!("{}", MIDDLEWARE_DOUBLE_USE);
-        }
-        rx
-    }
-}
+define_notifiers!(
+    HxRequestExtracted,
+    HxTargetExtracted,
+    HxTriggerExtracted,
+    HxTriggerNameExtracted
+);
 
 pub async fn vary_middleware(mut request: Request, next: Next) -> Response {
     let hx_request_rx = HxRequestExtracted::insert_into_extensions(request.extensions_mut());
