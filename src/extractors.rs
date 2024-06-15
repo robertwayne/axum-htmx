@@ -137,11 +137,10 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
-        use crate::vary_middleware::{HxRequestExtracted, Notifier};
         parts
             .extensions
-            .get_mut::<HxRequestExtracted>()
-            .map(Notifier::notify);
+            .get_mut::<crate::vary_middleware::HxRequestExtracted>()
+            .map(crate::vary_middleware::Notifier::notify);
 
         if parts.headers.contains_key(HX_REQUEST) {
             return Ok(HxRequest(true));
@@ -170,11 +169,10 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
-        use crate::vary_middleware::{HxTargetExtracted, Notifier};
         parts
             .extensions
-            .get_mut::<HxTargetExtracted>()
-            .map(Notifier::notify);
+            .get_mut::<crate::vary_middleware::HxTargetExtracted>()
+            .map(crate::vary_middleware::Notifier::notify);
 
         if let Some(target) = parts.headers.get(HX_TARGET) {
             if let Ok(target) = target.to_str() {
@@ -205,6 +203,11 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
+        parts
+            .extensions
+            .get_mut::<crate::vary_middleware::HxTriggerNameExtracted>()
+            .map(crate::vary_middleware::Notifier::notify);
+
         if let Some(trigger_name) = parts.headers.get(HX_TRIGGER_NAME) {
             if let Ok(trigger_name) = trigger_name.to_str() {
                 return Ok(HxTriggerName(Some(trigger_name.to_string())));
@@ -234,6 +237,11 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
+        parts
+            .extensions
+            .get_mut::<crate::vary_middleware::HxTriggerExtracted>()
+            .map(crate::vary_middleware::Notifier::notify);
+
         if let Some(trigger) = parts.headers.get(HX_TRIGGER) {
             if let Ok(trigger) = trigger.to_str() {
                 return Ok(HxTrigger(Some(trigger.to_string())));

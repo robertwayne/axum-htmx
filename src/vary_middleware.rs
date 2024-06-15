@@ -9,7 +9,7 @@ use http::{
 use tokio::sync::oneshot::{self, Receiver, Sender};
 
 use crate::{
-    headers::{HX_REQUEST_STR, HX_TARGET_STR},
+    headers::{HX_REQUEST_STR, HX_TARGET_STR, HX_TRIGGER_NAME_STR, HX_TRIGGER_STR},
     HxError,
 };
 
@@ -21,6 +21,12 @@ pub(crate) struct HxRequestExtracted(Option<Arc<Sender<()>>>);
 
 #[derive(Clone)]
 pub(crate) struct HxTargetExtracted(Option<Arc<Sender<()>>>);
+
+#[derive(Clone)]
+pub(crate) struct HxTriggerExtracted(Option<Arc<Sender<()>>>);
+
+#[derive(Clone)]
+pub(crate) struct HxTriggerNameExtracted(Option<Arc<Sender<()>>>);
 
 pub trait Notifier {
     fn sender(&mut self) -> Option<Sender<()>>;
@@ -39,6 +45,18 @@ impl Notifier for HxRequestExtracted {
 }
 
 impl Notifier for HxTargetExtracted {
+    fn sender(&mut self) -> Option<Sender<()>> {
+        self.0.take().and_then(Arc::into_inner)
+    }
+}
+
+impl Notifier for HxTriggerExtracted {
+    fn sender(&mut self) -> Option<Sender<()>> {
+        self.0.take().and_then(Arc::into_inner)
+    }
+}
+
+impl Notifier for HxTriggerNameExtracted {
     fn sender(&mut self) -> Option<Sender<()>> {
         self.0.take().and_then(Arc::into_inner)
     }
@@ -64,9 +82,32 @@ impl HxTargetExtracted {
     }
 }
 
+impl HxTriggerExtracted {
+    fn insert_into_extensions(extensions: &mut Extensions) -> Receiver<()> {
+        let (tx, rx) = oneshot::channel();
+        if extensions.insert(Self(Some(Arc::new(tx)))).is_some() {
+            panic!("{}", MIDDLEWARE_DOUBLE_USE);
+        }
+        rx
+    }
+}
+
+impl HxTriggerNameExtracted {
+    fn insert_into_extensions(extensions: &mut Extensions) -> Receiver<()> {
+        let (tx, rx) = oneshot::channel();
+        if extensions.insert(Self(Some(Arc::new(tx)))).is_some() {
+            panic!("{}", MIDDLEWARE_DOUBLE_USE);
+        }
+        rx
+    }
+}
+
 pub async fn vary_middleware(mut request: Request, next: Next) -> Response {
     let hx_request_rx = HxRequestExtracted::insert_into_extensions(request.extensions_mut());
     let hx_target_rx = HxTargetExtracted::insert_into_extensions(request.extensions_mut());
+    let hx_trigger_rx = HxTriggerExtracted::insert_into_extensions(request.extensions_mut());
+    let hx_trigger_name_rx =
+        HxTriggerNameExtracted::insert_into_extensions(request.extensions_mut());
 
     let mut response = next.run(request).await;
 
@@ -76,6 +117,12 @@ pub async fn vary_middleware(mut request: Request, next: Next) -> Response {
     }
     if hx_target_rx.await.is_ok() {
         used.push(HX_TARGET_STR)
+    }
+    if hx_trigger_rx.await.is_ok() {
+        used.push(HX_TRIGGER_STR)
+    }
+    if hx_trigger_name_rx.await.is_ok() {
+        used.push(HX_TRIGGER_NAME_STR)
     }
 
     if !used.is_empty() {
@@ -96,41 +143,82 @@ mod tests {
     use axum::{routing::get, Router};
 
     use super::*;
-    use crate::{HxRequest, HxTarget};
+    use crate::{HxRequest, HxTarget, HxTrigger, HxTriggerName};
 
     fn vary_headers(resp: &axum_test::TestResponse) -> Vec<HeaderValue> {
         resp.iter_headers_by_name("vary").cloned().collect()
     }
 
-    #[tokio::test]
-    async fn multiple_headers() {
+    fn server() -> axum_test::TestServer {
         let app = Router::new()
             .route("/no-extractors", get(|| async { () }))
-            .route("/single-extractor", get(|_: HxRequest| async { () }))
-            // Extractors can be used multiple times e.g. in middlewares
+            .route("/hx-request", get(|_: HxRequest| async { () }))
+            .route("/hx-target", get(|_: HxTarget| async { () }))
+            .route("/hx-trigger", get(|_: HxTrigger| async { () }))
+            .route("/hx-trigger-name", get(|_: HxTriggerName| async { () }))
             .route(
                 "/repeated-extractor",
                 get(|_: HxRequest, _: HxRequest| async { () }),
             )
             .route(
                 "/multiple-extractors",
-                get(|_: HxRequest, _: HxTarget| async { () }),
+                get(|_: HxRequest, _: HxTarget, _: HxTrigger, _: HxTriggerName| async { () }),
             )
             .layer(axum::middleware::from_fn(vary_middleware));
-        let server = axum_test::TestServer::new(app).unwrap();
+        axum_test::TestServer::new(app).unwrap()
+    }
 
-        assert!(vary_headers(&server.get("/no-extractors").await).is_empty());
+    #[tokio::test]
+    async fn no_extractors() {
+        assert!(vary_headers(&server().get("/no-extractors").await).is_empty());
+    }
+
+    #[tokio::test]
+    async fn single_hx_request() {
         assert_eq!(
-            vary_headers(&server.get("/single-extractor").await),
-            [HX_REQUEST_STR]
+            vary_headers(&server().get("/hx-request").await),
+            ["hx-request"]
         );
+    }
+
+    #[tokio::test]
+    async fn single_hx_target() {
         assert_eq!(
-            vary_headers(&server.get("/repeated-extractor").await),
-            [HX_REQUEST_STR]
+            vary_headers(&server().get("/hx-target").await),
+            ["hx-target"]
         );
+    }
+
+    #[tokio::test]
+    async fn single_hx_trigger() {
         assert_eq!(
-            vary_headers(&server.get("/multiple-extractors").await),
-            [format!("{HX_REQUEST_STR}, {HX_TARGET_STR}")]
+            vary_headers(&server().get("/hx-trigger").await),
+            ["hx-trigger"]
+        );
+    }
+
+    #[tokio::test]
+    async fn single_hx_trigger_name() {
+        assert_eq!(
+            vary_headers(&server().get("/hx-trigger-name").await),
+            ["hx-trigger-name"]
+        );
+    }
+
+    #[tokio::test]
+    async fn repeated_extractor() {
+        assert_eq!(
+            vary_headers(&server().get("/repeated-extractor").await),
+            ["hx-request"]
+        );
+    }
+
+    // Extractors can be used multiple times e.g. in middlewares
+    #[tokio::test]
+    async fn multiple_extractors() {
+        assert_eq!(
+            vary_headers(&server().get("/multiple-extractors").await),
+            ["hx-request, hx-target, hx-trigger, hx-trigger-name"],
         );
     }
 }
