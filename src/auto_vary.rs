@@ -17,7 +17,7 @@ use crate::{
 const MIDDLEWARE_DOUBLE_USE: &str =
     "Configuration error: `axum_httpx::vary_middleware` is used twice";
 
-pub trait Notifier {
+pub(crate) trait Notifier {
     fn sender(&mut self) -> Option<Sender<()>>;
 
     fn notify(&mut self) {
@@ -59,7 +59,7 @@ define_notifiers!(
     HxTriggerNameExtracted
 );
 
-pub async fn vary_middleware(mut request: Request, next: Next) -> Response {
+pub async fn middleware(mut request: Request, next: Next) -> Response {
     let exts = request.extensions_mut();
     let rx_header = [
         (HxRequestExtracted::insert(exts), HX_REQUEST_STR),
@@ -122,7 +122,7 @@ mod tests {
                 "/multiple-extractors",
                 get(|_: HxRequest, _: HxTarget, _: HxTrigger, _: HxTriggerName| async { () }),
             )
-            .layer(axum::middleware::from_fn(vary_middleware));
+            .layer(axum::middleware::from_fn(middleware));
         axum_test::TestServer::new(app).unwrap()
     }
 

@@ -23,5 +23,5 @@ pub use headers::*;
 #[doc(inline)]
 pub use responders::*;
 
-pub(crate) mod vary_middleware;
-pub use vary_middleware::vary_middleware;
+#[cfg(feature = "auto-vary")]
+pub mod auto_vary;

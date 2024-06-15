@@ -137,10 +137,11 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
+        #[cfg(feature = "auto-vary")]
         parts
             .extensions
-            .get_mut::<crate::vary_middleware::HxRequestExtracted>()
-            .map(crate::vary_middleware::Notifier::notify);
+            .get_mut::<crate::auto_vary::HxRequestExtracted>()
+            .map(crate::auto_vary::Notifier::notify);
 
         if parts.headers.contains_key(HX_REQUEST) {
             return Ok(HxRequest(true));
@@ -169,10 +170,11 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
+        #[cfg(feature = "auto-vary")]
         parts
             .extensions
-            .get_mut::<crate::vary_middleware::HxTargetExtracted>()
-            .map(crate::vary_middleware::Notifier::notify);
+            .get_mut::<crate::auto_vary::HxTargetExtracted>()
+            .map(crate::auto_vary::Notifier::notify);
 
         if let Some(target) = parts.headers.get(HX_TARGET) {
             if let Ok(target) = target.to_str() {
@@ -203,10 +205,11 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
+        #[cfg(feature = "auto-vary")]
         parts
             .extensions
-            .get_mut::<crate::vary_middleware::HxTriggerNameExtracted>()
-            .map(crate::vary_middleware::Notifier::notify);
+            .get_mut::<crate::auto_vary::HxTriggerNameExtracted>()
+            .map(crate::auto_vary::Notifier::notify);
 
         if let Some(trigger_name) = parts.headers.get(HX_TRIGGER_NAME) {
             if let Ok(trigger_name) = trigger_name.to_str() {
@@ -237,10 +240,11 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
+        #[cfg(feature = "auto-vary")]
         parts
             .extensions
-            .get_mut::<crate::vary_middleware::HxTriggerExtracted>()
-            .map(crate::vary_middleware::Notifier::notify);
+            .get_mut::<crate::auto_vary::HxTriggerExtracted>()
+            .map(crate::auto_vary::Notifier::notify);
 
         if let Some(trigger) = parts.headers.get(HX_TRIGGER) {
             if let Ok(trigger) = trigger.to_str() {
