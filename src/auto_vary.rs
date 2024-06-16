@@ -1,3 +1,6 @@
+//! A middleware to automatically add a `Vary` header when needed to address
+//! [HTMx caching issue](https://htmx.org/docs/#caching)
+
 use std::{
     sync::Arc,
     task::{Context, Poll},
@@ -19,9 +22,23 @@ use crate::{
     headers::{HX_REQUEST_STR, HX_TARGET_STR, HX_TRIGGER_NAME_STR, HX_TRIGGER_STR},
     HxError,
 };
+#[cfg(doc)]
+use crate::{HxRequest, HxTarget, HxTrigger, HxTriggerName};
 
 const MIDDLEWARE_DOUBLE_USE: &str =
     "Configuration error: `axum_httpx::vary_middleware` is used twice";
+
+/// Addresses [HTMx caching issue](https://htmx.org/docs/#caching)
+/// by automatically adding a corresponding `Vary` header when [`HxRequest`], [`HxTarget`],
+/// [`HxTrigger`], [`HxTriggerName`] or their combination is used.
+#[derive(Clone)]
+pub struct AutoVaryLayer;
+
+/// Tower service for [`AutoVaryLayer`]
+#[derive(Clone)]
+pub struct AutoVaryMiddleware<S> {
+    inner: S,
+}
 
 pub(crate) trait Notifier {
     fn sender(&mut self) -> Option<Sender<()>>;
@@ -65,20 +82,12 @@ define_notifiers!(
     HxTriggerNameExtracted
 );
 
-#[derive(Default, Clone)]
-pub struct AutoVaryLayer;
-
 impl<S> Layer<S> for AutoVaryLayer {
     type Service = AutoVaryMiddleware<S>;
 
     fn layer(&self, inner: S) -> Self::Service {
         AutoVaryMiddleware { inner }
     }
-}
-
-#[derive(Clone)]
-pub struct AutoVaryMiddleware<S> {
-    inner: S,
 }
 
 impl<S> Service<Request> for AutoVaryMiddleware<S>
