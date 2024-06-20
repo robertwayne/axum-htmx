@@ -23,6 +23,7 @@
   - [Getting Started](#getting-started)
   - [Extractors](#extractors)
   - [Responders](#responders)
+  - [Auto Caching Management](#auto-caching-management)
   - [Request Guards](#request-guards)
   - [Examples](#examples)
     - [Example: Extractors](#example-extractors)
@@ -76,6 +77,8 @@ any of your responses.
 | `HX-Trigger-After-Settle` | `HxResponseTrigger` | `axum_htmx::serde::HxEvent`         |
 | `HX-Trigger-After-Swap`   | `HxResponseTrigger` | `axum_htmx::serde::HxEvent`         |
 
+### Vary Responders
+
 Also, there are corresponding cache-related headers, which you may want to add to
 `GET` responses, depending on the htmx headers.
 
@@ -85,7 +88,7 @@ you need to add `Vary: HX-Request`. That causes the cache to be keyed based on a
 composite of the response URL and the `HX-Request` request header - rather than
 being based just on the response URL._
 
-Refer to [caching htmx docs section](https://htmx.org/docs/#caching) for details.
+Refer to [caching htmx docs section][htmx-caching] for details.
 
 | Header                  | Responder           |
 |-------------------------|---------------------|
@@ -94,10 +97,27 @@ Refer to [caching htmx docs section](https://htmx.org/docs/#caching) for details
 | `Vary: HX-Trigger`      | `VaryHxTrigger`     |
 | `Vary: HX-Trigger-Name` | `VaryHxTriggerName` |
 
+Look at the [Auto Caching Management](#auto-caching-management) section for
+automatic `Vary` headers management.
+
+## Auto Caching Management
+
+__Requires feature `auto-vary`.__
+
+Manual use of [Vary Reponders](#vary-responders) adds fragility to the code,
+because of the need to manually control correspondence between used extractors
+and the responders.
+
+We provide a [middleware](crate::AutoVaryLayer) to address this issue by
+automatically adding `Vary` headers when corresponding extractors are used.
+For example, on extracting [`HxRequest`], the middleware automatically adds 
+`Vary: hx-request` header to the response.
+
+Look at the usage [example][auto-vary-example].
 
 ## Request Guards
 
-__Requires features `guards`.__
+__Requires feature `guards`.__
 
 In addition to the extractors, there is also a route-wide layer request guard
 for the `HX-Request` header. This will redirect any requests without the header
@@ -207,10 +227,11 @@ fn router_two() -> Router {
 ## Feature Flags
 
 <!-- markdownlint-disable -->
-| Flag     | Default  | Description                                                | Dependencies                                |
-|----------|----------|------------------------------------------------------------|---------------------------------------------|
-| `guards` | Disabled | Adds request guard layers.                                 | `tower`, `futures-core`, `pin-project-lite` |
-| `serde`  | Disabled | Adds serde support for the `HxEvent` and `LocationOptions` | `serde`, `serde_json`                       |
+| Flag        | Default  | Description                                                | Dependencies                                |
+|-------------|----------|------------------------------------------------------------|---------------------------------------------|
+| `auto-vary` | Disabled | A middleware to address [HTMx caching issue][htmx-caching] | `futures`, `tokio`, `tower`                 |
+| `guards`    | Disabled | Adds request guard layers.                                 | `tower`, `futures-core`, `pin-project-lite` |
+| `serde`     | Disabled | Adds serde support for the `HxEvent` and `LocationOptions` | `serde`, `serde_json`                       |
 <!-- markdownlint-enable -->
 
 ## Contributing
@@ -233,3 +254,6 @@ cargo +nightly test --all-features
 - **[Apache License, Version 2.0](/LICENSE-APACHE)**
 
 at your option.
+
+[htmx-caching]: https://htmx.org/docs/#caching
+[auto-vary-example]: https://github.com/robertwayne/axum-htmx/blob/main/examples/auto-vary.rs

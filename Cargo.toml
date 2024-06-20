@@ -15,6 +15,7 @@ default = []
 unstable = []
 guards = ["tower", "futures-core", "pin-project-lite"]
 serde = ["dep:serde", "dep:serde_json"]
+auto-vary = ["futures", "tokio", "tower"]
 
 [dependencies]
 axum-core = "0.4"
@@ -30,9 +31,13 @@ pin-project-lite = { version = "0.2", optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
 serde_json = { version = "1", optional = true }
 
+# Optional dependencies required for the `auto-vary` feature.
+tokio = { version = "1", features = ["sync"], optional = true }
+futures = { version = "0.3", default-features = false, optional = true }
+
 [dev-dependencies]
 axum = { version = "0.7", default-features = false }
-axum-test = "14"
+axum-test = "15"
 tokio = { version = "1", features = ["full"] }
 tokio-test = "0.4"
 
