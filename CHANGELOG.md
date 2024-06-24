@@ -5,7 +5,7 @@
 - Added support for Vary headers in responses via the `VaryHxRequest`, `VaryHxTarget`, `VaryHxTrigger`, and `VaryHxTriggerName` responders. _([@imbolc](https://github.com/imbolc))_
 - Header names/values are now typed as `HeaderName` and `HeaderValue` instead of `&str`. _([@imbolc](https://github.com/imbolc))_
 - `HxError` now implements source on `error::Error`. _([@imbolc](https://github.com/imbolc))_
-- Added `Vary` responders and a middleware to automatically manage `Vary` headers when using corresponding extractors. [See this section of the README for more details.](https://github.com/robertwayne/axum-htmx?tab=readme-ov-file#vary-responders). _([@imbolc](https://github.com/imbolc))_
+- Added `Vary` responders and a middleware to automatically manage `Vary` headers when using corresponding extractors. The middleware is feature gated behind `auto-vary`. [See this section of the README for more details.](https://github.com/robertwayne/axum-htmx?tab=readme-ov-file#vary-responders). _([@imbolc](https://github.com/imbolc))_
 
 ## v0.5.0
 
