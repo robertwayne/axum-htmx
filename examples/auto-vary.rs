@@ -19,16 +19,16 @@ async fn main() {
     serve(listener, app).await.unwrap();
 }
 
-// Our handler differentiates full-page GET requests from HTMx-based ones by looking at the `hx-request`
+// Our handler differentiates full-page GET requests from htmx-based ones by looking at the `hx-request`
 // requestheader.
 //
 // The middleware sees the usage of the `HxRequest` extractor and automatically adds the
 // `Vary: hx-request` response header.
 async fn handler(HxRequest(hx_request): HxRequest) -> Html<&'static str> {
     if hx_request {
-        // For HTMx-based GET request, it returns a partial page update
+        // For htmx-based GET request, it returns a partial page update
         sleep(Duration::from_secs(3)).await;
-        return Html("HTMx response");
+        return Html("htmx response");
     }
     // While for a normal GET request, it returns the whole page
     Html(

@@ -1,5 +1,5 @@
 //! A middleware to automatically add a `Vary` header when needed to address
-//! [HTMx caching issue](https://htmx.org/docs/#caching)
+//! [htmx caching issue](https://htmx.org/docs/#caching)
 
 use std::{
     sync::Arc,
@@ -28,7 +28,7 @@ use crate::{HxRequest, HxTarget, HxTrigger, HxTriggerName};
 const MIDDLEWARE_DOUBLE_USE: &str =
     "Configuration error: `axum_httpx::vary_middleware` is used twice";
 
-/// Addresses [HTMx caching issue](https://htmx.org/docs/#caching)
+/// Addresses [htmx caching issue](https://htmx.org/docs/#caching)
 /// by automatically adding a corresponding `Vary` header when [`HxRequest`], [`HxTarget`],
 /// [`HxTrigger`], [`HxTriggerName`] or their combination is used.
 #[derive(Clone)]
