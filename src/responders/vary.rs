@@ -10,13 +10,15 @@ const HX_TRIGGER_NAME: HeaderValue = HeaderValue::from_static(headers::HX_TRIGGE
 
 /// The `Vary: HX-Request` header.
 ///
-/// You may want to add this header to the response if your handler responds differently based on
-/// the `HX-Request` request header.
+/// You may want to add this header to the response if your handler responds
+/// differently based on the `HX-Request` request header.
 ///
-/// For example, if your server renders the full HTML when the `HX-Request` header is missing or
-/// `false`, and it renders a fragment of that HTML when `HX-Request: true`.
+/// For example, if your server renders the full HTML when the `HX-Request`
+/// header is missing or `false`, and it renders a fragment of that HTML when
+/// `HX-Request: true`.
 ///
-/// You probably need this only for `GET` requests, as other HTTP methods are not cached by default.
+/// You probably need this only for `GET` requests, as other HTTP methods are
+/// not cached by default.
 ///
 /// See <https://htmx.org/docs/#caching> for more information.
 #[derive(Debug, Clone)]
@@ -41,10 +43,11 @@ impl extractors::HxRequest {
 
 /// The `Vary: HX-Target` header.
 ///
-/// You may want to add this header to the response if your handler responds differently based on
-/// the `HX-Target` request header.
+/// You may want to add this header to the response if your handler responds
+/// differently based on the `HX-Target` request header.
 ///
-/// You probably need this only for `GET` requests, as other HTTP methods are not cached by default.
+/// You probably need this only for `GET` requests, as other HTTP methods are
+/// not cached by default.
 ///
 /// See <https://htmx.org/docs/#caching> for more information.
 #[derive(Debug, Clone)]
@@ -69,10 +72,11 @@ impl extractors::HxTarget {
 
 /// The `Vary: HX-Trigger` header.
 ///
-/// You may want to add this header to the response if your handler responds differently based on
-/// the `HX-Trigger` request header.
+/// You may want to add this header to the response if your handler responds
+/// differently based on the `HX-Trigger` request header.
 ///
-/// You probably need this only for `GET` requests, as other HTTP methods are not cached by default.
+/// You probably need this only for `GET` requests, as other HTTP methods are
+/// not cached by default.
 ///
 /// See <https://htmx.org/docs/#caching> for more information.
 #[derive(Debug, Clone)]
@@ -97,10 +101,11 @@ impl extractors::HxTrigger {
 
 /// The `Vary: HX-Trigger-Name` header.
 ///
-/// You may want to add this header to the response if your handler responds differently based on
-/// the `HX-Trigger-Name` request header.
+/// You may want to add this header to the response if your handler responds
+/// differently based on the `HX-Trigger-Name` request header.
 ///
-/// You probably need this only for `GET` requests, as other HTTP methods are not cached by default.
+/// You probably need this only for `GET` requests, as other HTTP methods are
+/// not cached by default.
 ///
 /// See <https://htmx.org/docs/#caching> for more information.
 #[derive(Debug, Clone)]

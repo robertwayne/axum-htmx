@@ -29,8 +29,8 @@ const MIDDLEWARE_DOUBLE_USE: &str =
     "Configuration error: `axum_httpx::vary_middleware` is used twice";
 
 /// Addresses [htmx caching issue](https://htmx.org/docs/#caching)
-/// by automatically adding a corresponding `Vary` header when [`HxRequest`], [`HxTarget`],
-/// [`HxTrigger`], [`HxTriggerName`] or their combination is used.
+/// by automatically adding a corresponding `Vary` header when [`HxRequest`],
+///  [`HxTarget`], [`HxTrigger`], [`HxTriggerName`] or their combination is used.
 #[derive(Clone)]
 pub struct AutoVaryLayer;
 
