@@ -23,6 +23,7 @@
   - [Getting Started](#getting-started)
   - [Extractors](#extractors)
   - [Responders](#responders)
+    - [Vary Responders](#vary-responders)
   - [Auto Caching Management](#auto-caching-management)
   - [Request Guards](#request-guards)
   - [Examples](#examples)
@@ -31,6 +32,7 @@
     - [Example: Router Guard](#example-router-guard)
   - [Feature Flags](#feature-flags)
   - [Contributing](#contributing)
+    - [Testing](#testing)
   - [License](#license)
 
 ## Getting Started
@@ -229,7 +231,7 @@ fn router_two() -> Router {
 <!-- markdownlint-disable -->
 | Flag        | Default  | Description                                                | Dependencies                                |
 |-------------|----------|------------------------------------------------------------|---------------------------------------------|
-| `auto-vary` | Disabled | A middleware to address [HTMx caching issue][htmx-caching] | `futures`, `tokio`, `tower`                 |
+| `auto-vary` | Disabled | A middleware to address [htmx caching issue][htmx-caching] | `futures`, `tokio`, `tower`                 |
 | `guards`    | Disabled | Adds request guard layers.                                 | `tower`, `futures-core`, `pin-project-lite` |
 | `serde`     | Disabled | Adds serde support for the `HxEvent` and `LocationOptions` | `serde`, `serde_json`                       |
 <!-- markdownlint-enable -->
