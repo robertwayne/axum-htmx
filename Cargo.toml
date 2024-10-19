@@ -19,11 +19,11 @@ auto-vary = ["futures", "tokio", "tower"]
 
 [dependencies]
 axum-core = "0.4"
-http = { version = "1.0", default-features = false }
+http = { version = "1", default-features = false }
 async-trait = "0.1"
 
 # Optional dependencies required for the `guards` feature.
-tower = { version = "0.4", default-features = false, optional = true }
+tower = { version = "0.5", default-features = false, optional = true }
 futures-core = { version = "0.3", optional = true }
 pin-project-lite = { version = "0.2", optional = true }
 
@@ -37,7 +37,7 @@ futures = { version = "0.3", default-features = false, optional = true }
 
 [dev-dependencies]
 axum = { version = "0.7", default-features = false }
-axum-test = "15"
+axum-test = "16"
 tokio = { version = "1", features = ["full"] }
 tokio-test = "0.4"
 
