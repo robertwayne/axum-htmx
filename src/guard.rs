@@ -96,7 +96,7 @@ mod private {
         }
     }
 
-    impl<'a, F, B, E> Future for ResponseFuture<'a, F>
+    impl<F, B, E> Future for ResponseFuture<'_, F>
     where
         F: Future<Output = Result<Response<B>, E>>,
         B: Default,
