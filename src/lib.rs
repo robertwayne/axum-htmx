@@ -1,6 +1,7 @@
 #![cfg_attr(feature = "unstable", feature(doc_cfg))]
 #![doc = include_str!("../README.md")]
 #![forbid(unsafe_code)]
+#![allow(clippy::too_long_first_doc_paragraph)]
 
 mod error;
 pub use error::*;

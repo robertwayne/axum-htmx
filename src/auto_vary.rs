@@ -28,8 +28,6 @@ use crate::{HxRequest, HxTarget, HxTrigger, HxTriggerName};
 const MIDDLEWARE_DOUBLE_USE: &str =
     "Configuration error: `axum_httpx::vary_middleware` is used twice";
 
-/// Automatically adds a `Vary` header when needed.
-///
 /// Addresses [htmx caching issues](https://htmx.org/docs/#caching)
 /// by automatically adding a corresponding `Vary` header when
 /// [`HxRequest`], [`HxTarget`], [`HxTrigger`], [`HxTriggerName`]
