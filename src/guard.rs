@@ -1,7 +1,6 @@
 //! Request guard for protecting a router against non-htmx requests.
 
 use std::{
-    fmt,
     future::Future,
     pin::Pin,
     task::{Context, Poll},
@@ -123,14 +122,3 @@ mod private {
         }
     }
 }
-
-#[derive(Debug, Default)]
-struct HxRequestGuardError;
-
-impl fmt::Display for HxRequestGuardError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("HxRequestGuardError")
-    }
-}
-
-impl std::error::Error for HxRequestGuardError {}
