@@ -18,8 +18,6 @@
 
 ## Table of Contents
 
-- [axum-htmx](#axum-htmx)
-  - [Table of Contents](#table-of-contents)
   - [Getting Started](#getting-started)
   - [Extractors](#extractors)
   - [Responders](#responders)
