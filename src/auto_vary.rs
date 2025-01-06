@@ -45,7 +45,7 @@ pub(crate) trait Notifier {
     fn sender(&mut self) -> Option<Sender<()>>;
 
     fn notify(&mut self) {
-        if let Some(sender) = self.sender().take() {
+        if let Some(sender) = self.sender() {
             sender.send(()).ok();
         }
     }
