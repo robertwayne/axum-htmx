@@ -40,7 +40,7 @@ axum = { version = "0.8", default-features = false, features = [
     "http1",
 ] }
 # axum-test = "16"
-axum-test = { git = "https://github.com/JosephLenton/axum-test.git", branch = "feat-axum-8" }
+axum-test = { version = "17.0.1" }
 tokio = { version = "1", features = ["full"] }
 tokio-test = "0.4"
 
