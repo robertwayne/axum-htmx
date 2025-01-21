@@ -1,6 +1,5 @@
 //! Axum extractors for htmx request headers.
 
-use async_trait::async_trait;
 use axum_core::extract::FromRequestParts;
 use http::request::Parts;
 
@@ -21,7 +20,6 @@ use crate::{
 #[derive(Debug, Clone, Copy)]
 pub struct HxBoosted(pub bool);
 
-#[async_trait]
 impl<S> FromRequestParts<S> for HxBoosted
 where
     S: Send + Sync,
@@ -30,9 +28,9 @@ where
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
         if parts.headers.contains_key(HX_BOOSTED) {
-            return Ok(HxBoosted(true));
+            Ok(HxBoosted(true))
         } else {
-            return Ok(HxBoosted(false));
+            Ok(HxBoosted(false))
         }
     }
 }
@@ -47,7 +45,6 @@ where
 #[derive(Debug, Clone)]
 pub struct HxCurrentUrl(pub Option<http::Uri>);
 
-#[async_trait]
 impl<S> FromRequestParts<S> for HxCurrentUrl
 where
     S: Send + Sync,
@@ -64,7 +61,7 @@ where
             return Ok(HxCurrentUrl(url));
         }
 
-        return Ok(HxCurrentUrl(None));
+        Ok(HxCurrentUrl(None))
     }
 }
 
@@ -75,7 +72,6 @@ where
 #[derive(Debug, Clone, Copy)]
 pub struct HxHistoryRestoreRequest(pub bool);
 
-#[async_trait]
 impl<S> FromRequestParts<S> for HxHistoryRestoreRequest
 where
     S: Send + Sync,
@@ -84,9 +80,9 @@ where
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
         if parts.headers.contains_key(HX_HISTORY_RESTORE_REQUEST) {
-            return Ok(HxHistoryRestoreRequest(true));
+            Ok(HxHistoryRestoreRequest(true))
         } else {
-            return Ok(HxHistoryRestoreRequest(false));
+            Ok(HxHistoryRestoreRequest(false))
         }
     }
 }
@@ -101,7 +97,6 @@ where
 #[derive(Debug, Clone)]
 pub struct HxPrompt(pub Option<String>);
 
-#[async_trait]
 impl<S> FromRequestParts<S> for HxPrompt
 where
     S: Send + Sync,
@@ -115,7 +110,7 @@ where
             }
         }
 
-        return Ok(HxPrompt(None));
+        Ok(HxPrompt(None))
     }
 }
 
@@ -129,7 +124,6 @@ where
 #[derive(Debug, Clone, Copy)]
 pub struct HxRequest(pub bool);
 
-#[async_trait]
 impl<S> FromRequestParts<S> for HxRequest
 where
     S: Send + Sync,
@@ -144,9 +138,9 @@ where
             .map(crate::auto_vary::Notifier::notify);
 
         if parts.headers.contains_key(HX_REQUEST) {
-            return Ok(HxRequest(true));
+            Ok(HxRequest(true))
         } else {
-            return Ok(HxRequest(false));
+            Ok(HxRequest(false))
         }
     }
 }
@@ -162,7 +156,6 @@ where
 #[derive(Debug, Clone)]
 pub struct HxTarget(pub Option<String>);
 
-#[async_trait]
 impl<S> FromRequestParts<S> for HxTarget
 where
     S: Send + Sync,
@@ -182,7 +175,7 @@ where
             }
         }
 
-        return Ok(HxTarget(None));
+        Ok(HxTarget(None))
     }
 }
 
@@ -197,7 +190,6 @@ where
 #[derive(Debug, Clone)]
 pub struct HxTriggerName(pub Option<String>);
 
-#[async_trait]
 impl<S> FromRequestParts<S> for HxTriggerName
 where
     S: Send + Sync,
@@ -217,7 +209,7 @@ where
             }
         }
 
-        return Ok(HxTriggerName(None));
+        Ok(HxTriggerName(None))
     }
 }
 
@@ -232,7 +224,6 @@ where
 #[derive(Debug, Clone)]
 pub struct HxTrigger(pub Option<String>);
 
-#[async_trait]
 impl<S> FromRequestParts<S> for HxTrigger
 where
     S: Send + Sync,
@@ -252,6 +243,6 @@ where
             }
         }
 
-        return Ok(HxTrigger(None));
+        Ok(HxTrigger(None))
     }
 }
