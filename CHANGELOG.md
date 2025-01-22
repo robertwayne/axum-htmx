@@ -2,7 +2,7 @@
 
 ## v0.7.0
 
-- Add support for axum v0.8. _([@kakalos12](https://github.com/kakalos12))_
+- Support axum v0.8. _([@kakalos12](https://github.com/kakalos12))_
 
 ## v0.6.0
 
