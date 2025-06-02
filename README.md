@@ -65,11 +65,11 @@ any of your responses.
 
 | Header                    | Responder           | Value                               |
 |---------------------------|---------------------|-------------------------------------|
-| `HX-Location`             | `HxLocation`        | `axum::http::Uri`                   |
-| `HX-Push-Url`             | `HxPushUrl`         | `axum::http::Uri`                   |
-| `HX-Redirect`             | `HxRedirect`        | `axum::http::Uri`                   |
+| `HX-Location`             | `HxLocation`        | `String`                   |
+| `HX-Push-Url`             | `HxPushUrl`         | `String`                   |
+| `HX-Redirect`             | `HxRedirect`        | `String`                   |
 | `HX-Refresh`              | `HxRefresh`         | `bool`                              |
-| `HX-Replace-Url`          | `HxReplaceUrl`      | `axum::http::Uri`                   |
+| `HX-Replace-Url`          | `HxReplaceUrl`      | `String`                   |
 | `HX-Reswap`               | `HxReswap`          | `axum_htmx::responders::SwapOption` |
 | `HX-Retarget`             | `HxRetarget`        | `String`                            |
 | `HX-Reselect`             | `HxReselect`        | `String`                            |

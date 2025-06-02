@@ -1,9 +1,9 @@
 //! Axum responses for htmx response headers.
 
-use std::{convert::Infallible, str::FromStr};
+use std::convert::Infallible;
 
 use axum_core::response::{IntoResponseParts, ResponseParts};
-use http::{HeaderValue, Uri};
+use http::HeaderValue;
 
 use crate::{headers, HxError};
 
@@ -32,7 +32,7 @@ const HX_SWAP_NONE: &str = "none";
 ///
 /// See <https://htmx.org/headers/hx-push-url/> for more information.
 #[derive(Debug, Clone)]
-pub struct HxPushUrl(pub Uri);
+pub struct HxPushUrl(pub String);
 
 impl IntoResponseParts for HxPushUrl {
     type Error = HxError;
@@ -47,17 +47,9 @@ impl IntoResponseParts for HxPushUrl {
     }
 }
 
-impl From<Uri> for HxPushUrl {
-    fn from(uri: Uri) -> Self {
-        Self(uri)
-    }
-}
-
-impl<'a> TryFrom<&'a str> for HxPushUrl {
-    type Error = <Uri as FromStr>::Err;
-
-    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
-        Ok(Self(value.parse()?))
+impl<'a> From<&'a str> for HxPushUrl {
+    fn from(value: &'a str) -> Self {
+        Self(value.to_string())
     }
 }
 
@@ -68,7 +60,7 @@ impl<'a> TryFrom<&'a str> for HxPushUrl {
 /// Will fail if the supplied Uri contains characters that are not visible ASCII
 /// (32-127).
 #[derive(Debug, Clone)]
-pub struct HxRedirect(pub Uri);
+pub struct HxRedirect(pub String);
 
 impl IntoResponseParts for HxRedirect {
     type Error = HxError;
@@ -83,17 +75,9 @@ impl IntoResponseParts for HxRedirect {
     }
 }
 
-impl From<Uri> for HxRedirect {
-    fn from(uri: Uri) -> Self {
-        Self(uri)
-    }
-}
-
-impl<'a> TryFrom<&'a str> for HxRedirect {
-    type Error = <Uri as FromStr>::Err;
-
-    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
-        Ok(Self(value.parse()?))
+impl<'a> From<&'a str> for HxRedirect {
+    fn from(value: &'a str) -> Self {
+        Self(value.to_string())
     }
 }
 
@@ -137,7 +121,7 @@ impl IntoResponseParts for HxRefresh {
 ///
 /// See <https://htmx.org/headers/hx-replace-url/> for more information.
 #[derive(Debug, Clone)]
-pub struct HxReplaceUrl(pub Uri);
+pub struct HxReplaceUrl(pub String);
 
 impl IntoResponseParts for HxReplaceUrl {
     type Error = HxError;
@@ -152,17 +136,9 @@ impl IntoResponseParts for HxReplaceUrl {
     }
 }
 
-impl From<Uri> for HxReplaceUrl {
-    fn from(uri: Uri) -> Self {
-        Self(uri)
-    }
-}
-
-impl<'a> TryFrom<&'a str> for HxReplaceUrl {
-    type Error = <Uri as FromStr>::Err;
-
-    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
-        Ok(Self(value.parse()?))
+impl<'a> From<&'a str> for HxReplaceUrl {
+    fn from(value: &'a str) -> Self {
+        Self(value.to_string())
     }
 }
 

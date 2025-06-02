@@ -1,7 +1,5 @@
-use std::str::FromStr;
-
 use axum_core::response::{IntoResponseParts, ResponseParts};
-use http::{HeaderValue, Uri};
+use http::HeaderValue;
 
 use crate::{headers, HxError};
 
@@ -12,14 +10,14 @@ use crate::{headers, HxError};
 /// target on the page, you must enable the `serde` feature flag and specify
 /// [`LocationOptions`].
 ///
-/// Will fail if the supplied Uri contains characters that are not visible ASCII
+/// Will fail if the supplied uri contains characters that are not visible ASCII
 /// (32-127).
 ///
 /// See <https://htmx.org/headers/hx-location/> for more information.
 #[derive(Debug, Clone)]
 pub struct HxLocation {
     /// Uri of the new location.
-    pub uri: Uri,
+    pub uri: String,
     /// Extra options.
     #[cfg(feature = "serde")]
     #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
@@ -27,43 +25,24 @@ pub struct HxLocation {
 }
 
 impl HxLocation {
-    /// Creates location from [`Uri`] without any options.
-    pub fn from_uri(uri: Uri) -> Self {
+    /// Parses `uri` and sets it as location.
+    #[allow(clippy::should_implement_trait)]
+    pub fn from_str(uri: impl AsRef<str>) -> Self {
         Self {
             #[cfg(feature = "serde")]
             options: LocationOptions::default(),
-            uri,
+            uri: uri.as_ref().to_string(),
         }
-    }
-
-    /// Creates location from [`Uri`] and options.
-    #[cfg(feature = "serde")]
-    #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
-    pub fn from_uri_with_options(uri: Uri, options: LocationOptions) -> Self {
-        Self { uri, options }
-    }
-
-    /// Parses `uri` and sets it as location.
-    #[allow(clippy::should_implement_trait)]
-    pub fn from_str(uri: impl AsRef<str>) -> Result<Self, http::uri::InvalidUri> {
-        Ok(Self {
-            #[cfg(feature = "serde")]
-            options: LocationOptions::default(),
-            uri: uri.as_ref().parse::<Uri>()?,
-        })
     }
 
     /// Parses `uri` and sets it as location with additional options.
     #[cfg(feature = "serde")]
     #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
-    pub fn from_str_with_options(
-        uri: impl AsRef<str>,
-        options: LocationOptions,
-    ) -> Result<Self, http::uri::InvalidUri> {
-        Ok(Self {
+    pub fn from_str_with_options(uri: impl AsRef<str>, options: LocationOptions) -> Self {
+        Self {
             options,
-            uri: uri.as_ref().parse::<Uri>()?,
-        })
+            uri: uri.as_ref().to_string(),
+        }
     }
 
     #[cfg(feature = "serde")]
@@ -88,34 +67,16 @@ impl HxLocation {
     }
 }
 
-impl From<Uri> for HxLocation {
-    fn from(uri: Uri) -> Self {
-        Self::from_uri(uri)
-    }
-}
-
-#[cfg(feature = "serde")]
-#[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
-impl From<(Uri, LocationOptions)> for HxLocation {
-    fn from((uri, options): (Uri, LocationOptions)) -> Self {
-        Self::from_uri_with_options(uri, options)
-    }
-}
-
-impl<'a> TryFrom<&'a str> for HxLocation {
-    type Error = <Uri as FromStr>::Err;
-
-    fn try_from(uri: &'a str) -> Result<Self, Self::Error> {
+impl<'a> From<&'a str> for HxLocation {
+    fn from(uri: &'a str) -> Self {
         Self::from_str(uri)
     }
 }
 
 #[cfg(feature = "serde")]
 #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
-impl<'a> TryFrom<(&'a str, LocationOptions)> for HxLocation {
-    type Error = <Uri as FromStr>::Err;
-
-    fn try_from((uri, options): (&'a str, LocationOptions)) -> Result<Self, Self::Error> {
+impl<'a> From<(&'a str, LocationOptions)> for HxLocation {
+    fn from((uri, options): (&'a str, LocationOptions)) -> Self {
         Self::from_str_with_options(uri, options)
     }
 }
@@ -207,11 +168,11 @@ mod tests {
     fn test_serialize_location() {
         use crate::SwapOption;
 
-        let loc = HxLocation::try_from("/foo").unwrap();
+        let loc = HxLocation::from("/foo");
         assert_eq!(loc.into_header_with_options().unwrap(), "/foo");
 
-        let loc = HxLocation::from_uri_with_options(
-            "/foo".parse().unwrap(),
+        let loc = HxLocation::from_str_with_options(
+            "/foo",
             LocationOptions {
                 event: Some("click".into()),
                 swap: Some(SwapOption::InnerHtml),
