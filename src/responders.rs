@@ -40,7 +40,7 @@ impl IntoResponseParts for HxPushUrl {
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
         res.headers_mut().insert(
             headers::HX_PUSH_URL,
-            HeaderValue::from_maybe_shared(self.0.to_string())?,
+            HeaderValue::from_maybe_shared(self.0)?,
         );
 
         Ok(res)
@@ -68,7 +68,7 @@ impl IntoResponseParts for HxRedirect {
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
         res.headers_mut().insert(
             headers::HX_REDIRECT,
-            HeaderValue::from_maybe_shared(self.0.to_string())?,
+            HeaderValue::from_maybe_shared(self.0)?,
         );
 
         Ok(res)
@@ -129,7 +129,7 @@ impl IntoResponseParts for HxReplaceUrl {
     fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
         res.headers_mut().insert(
             headers::HX_REPLACE_URL,
-            HeaderValue::from_maybe_shared(self.0.to_string())?,
+            HeaderValue::from_maybe_shared(self.0)?,
         );
 
         Ok(res)
