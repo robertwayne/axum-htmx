@@ -113,7 +113,6 @@ impl IntoResponseParts for HxLocation {
 #[cfg(feature = "serde")]
 #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
 #[derive(Debug, Clone, serde::Serialize, Default)]
-#[non_exhaustive]
 pub struct LocationOptions {
     /// The source element of the request.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -136,6 +135,10 @@ pub struct LocationOptions {
     /// Headers to submit with the request.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub headers: Option<serde_json::Value>,
+    // Hacky way of making this struct non-exhaustive.
+    // See <https://rust-lang.github.io/rfcs/2008-non-exhaustive.html#functional-record-updates> and <https://github.com/robertwayne/axum-htmx/issues/29> for reasoning.
+    #[serde(skip)]
+    pub non_exhaustive: (),
 }
 
 #[cfg(feature = "serde")]
@@ -150,6 +153,7 @@ impl LocationOptions {
             swap: None,
             values: None,
             headers: None,
+            non_exhaustive: (),
         } = self
         else {
             return false;
