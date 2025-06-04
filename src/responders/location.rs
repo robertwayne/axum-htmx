@@ -1,7 +1,7 @@
 use axum_core::response::{IntoResponseParts, ResponseParts};
 use http::HeaderValue;
 
-use crate::{headers, HxError};
+use crate::{HxError, headers};
 
 /// The `HX-Location` header.
 ///

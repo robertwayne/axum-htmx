@@ -1,6 +1,6 @@
 use axum_core::response::{IntoResponseParts, ResponseParts};
 
-use crate::{headers, HxError};
+use crate::{HxError, headers};
 
 /// Represents a client-side event carrying optional data.
 #[derive(Debug, Clone)]

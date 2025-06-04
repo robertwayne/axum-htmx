@@ -10,17 +10,17 @@ use axum_core::{
     extract::Request,
     response::{IntoResponse, Response},
 };
-use futures::future::{join_all, BoxFuture};
+use futures::future::{BoxFuture, join_all};
 use http::{
-    header::{HeaderValue, VARY},
     Extensions,
+    header::{HeaderValue, VARY},
 };
 use tokio::sync::oneshot::{self, Receiver, Sender};
 use tower::{Layer, Service};
 
 use crate::{
-    headers::{HX_REQUEST_STR, HX_TARGET_STR, HX_TRIGGER_NAME_STR, HX_TRIGGER_STR},
     HxError,
+    headers::{HX_REQUEST_STR, HX_TARGET_STR, HX_TRIGGER_NAME_STR, HX_TRIGGER_STR},
 };
 #[cfg(doc)]
 use crate::{HxRequest, HxTarget, HxTrigger, HxTriggerName};
@@ -145,7 +145,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use axum::{routing::get, Router};
+    use axum::{Router, routing::get};
 
     use super::*;
     use crate::{HxRequest, HxTarget, HxTrigger, HxTriggerName};

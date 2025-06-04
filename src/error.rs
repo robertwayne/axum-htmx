@@ -2,8 +2,8 @@ use std::{error, fmt};
 
 use axum_core::response::IntoResponse;
 use http::{
-    header::{InvalidHeaderValue, MaxSizeReached},
     StatusCode,
+    header::{InvalidHeaderValue, MaxSizeReached},
 };
 
 #[derive(Debug)]
@@ -50,10 +50,10 @@ impl fmt::Display for HxError {
 impl error::Error for HxError {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match self {
-            HxError::InvalidHeaderValue(ref e) => Some(e),
-            HxError::TooManyResponseHeaders(ref e) => Some(e),
+            HxError::InvalidHeaderValue(e) => Some(e),
+            HxError::TooManyResponseHeaders(e) => Some(e),
             #[cfg(feature = "serde")]
-            HxError::Json(ref e) => Some(e),
+            HxError::Json(e) => Some(e),
         }
     }
 }

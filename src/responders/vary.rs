@@ -1,7 +1,7 @@
 use axum_core::response::{IntoResponseParts, ResponseParts};
 use http::header::{HeaderValue, VARY};
 
-use crate::{extractors, headers, HxError};
+use crate::{HxError, extractors, headers};
 
 const HX_REQUEST: HeaderValue = HeaderValue::from_static(headers::HX_REQUEST_STR);
 const HX_TARGET: HeaderValue = HeaderValue::from_static(headers::HX_TARGET_STR);
@@ -132,7 +132,7 @@ impl extractors::HxTriggerName {
 mod tests {
     use std::collections::hash_set::HashSet;
 
-    use axum::{routing::get, Router};
+    use axum::{Router, routing::get};
 
     use super::*;
 

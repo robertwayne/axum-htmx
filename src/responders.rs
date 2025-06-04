@@ -5,7 +5,7 @@ use std::convert::Infallible;
 use axum_core::response::{IntoResponseParts, ResponseParts};
 use http::HeaderValue;
 
-use crate::{headers, HxError};
+use crate::{HxError, headers};
 
 mod location;
 pub use location::*;

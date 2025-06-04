@@ -7,7 +7,7 @@ use std::{
 };
 
 use futures_core::ready;
-use http::{header::LOCATION, response::Response, Request, StatusCode};
+use http::{Request, StatusCode, header::LOCATION, response::Response};
 use pin_project_lite::pin_project;
 use tower::{Layer, Service};
 
