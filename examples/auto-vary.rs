@@ -4,7 +4,7 @@
 //! `cargo run --features auto-vary --example auto-vary`
 use std::time::Duration;
 
-use axum::{response::Html, routing::get, serve, Router};
+use axum::{Router, response::Html, routing::get, serve};
 use axum_htmx::{AutoVaryLayer, HxRequest};
 use tokio::{net::TcpListener, time::sleep};
 
