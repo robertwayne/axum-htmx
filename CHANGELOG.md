@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.8.0
+
+- Change most `HxLocation`, `HxPushUrl`, `HxRedirect`, and `HxReplaceUrl` to take `String` instead of `Uri` for better flexibility and ease-of-use. _([@skwee357](https://github.com/skwee357))_
+    - `HxCurrentUrl` remains unchanged in order to align with axum.
+- Changed how `LocationOptions` is handled internally with regard to non-exhaustiveness,
+allowing external crates to use the functional record update syntax.
+
 ## v0.7.0
 
 - Support axum v0.8. _([@kakalos12](https://github.com/kakalos12))_
