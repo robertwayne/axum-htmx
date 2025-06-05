@@ -1,47 +1,36 @@
 name: ci
 
 env:
-    CARGO_TERM_COLOR: always
+  CARGO_TERM_COLOR: always
 
 on:
-    push:
-        branches:
-            - main
-    pull_request: {}
+  push:
+    branches: [main]
+  pull_request: {}
 
 jobs:
-    check:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                toolchain:
-                    - stable
-                    - nightly
-        steps:
-            - uses: actions/checkout@v4
-            - uses: dtolnay/rust-toolchain@master
-              with:
-                  toolchain: ${{ matrix.toolchain }}
-                  components: clippy, rustfmt
-            - uses: Swatinem/rust-cache@v2
-            - name: run clippy
-              run: cargo +nightly clippy --all-features -- -D warnings
-            - name: run formatter checks
-              run: cargo +nightly fmt --all --check
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - name: run clippy
+        run: cargo clippy --all-features -- -D warnings
+      - name: run formatter checks
+        run: cargo fmt --all --check
 
-    test:
-        needs: check
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                toolchain:
-                    - stable
-                    - nightly
-        steps:
-            - uses: actions/checkout@v4
-            - uses: dtolnay/rust-toolchain@master
-              with:
-                  toolchain: ${{ matrix.toolchain }}
-            - uses: Swatinem/rust-cache@v2
-            - name: run tests
-              run: cargo +nightly test --all-features
+  test:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly
+      - uses: Swatinem/rust-cache@v2
+      - name: run tests
+        run: cargo test --all-features
