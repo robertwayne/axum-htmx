@@ -9,6 +9,7 @@ keywords = ["axum", "htmx"]
 readme = "README.md"
 version = "0.8.0"
 edition = "2024"
+rust-version = "1.87"
 
 [features]
 default = []
