@@ -45,9 +45,10 @@ impl HxLocation {
         }
     }
 
+    #[cfg(feature = "serde")]
     fn into_header_with_options(self) -> Result<String, HxError> {
         match self.options {
-            Some(options) => {
+            Some(options) if !options.is_default() => {
                 #[derive(serde::Serialize)]
                 struct FlattenedHxLocation<'a> {
                     path: &'a str,
