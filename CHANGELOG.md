@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.8.1
+
+- Revert an accidental breaking change introducting a nightly-only feature.
+
 ## v0.8.0
 
 - Change `HxLocation`, `HxPushUrl`, `HxRedirect`, and `HxReplaceUrl` to take `String` instead of `Uri` for better flexibility and ease-of-use. _([@skwee357](https://github.com/skwee357))_
