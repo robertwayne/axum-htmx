@@ -104,10 +104,10 @@ where
     type Rejection = std::convert::Infallible;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
-        if let Some(prompt) = parts.headers.get(HX_PROMPT)
-            && let Ok(prompt) = prompt.to_str()
-        {
-            return Ok(HxPrompt(Some(prompt.to_string())));
+        if let Some(prompt) = parts.headers.get(HX_PROMPT) {
+            if let Ok(prompt) = prompt.to_str() {
+                return Ok(HxPrompt(Some(prompt.to_string())));
+            }
         }
 
         Ok(HxPrompt(None))
@@ -169,10 +169,10 @@ where
             .get_mut::<crate::auto_vary::HxTargetExtracted>()
             .map(crate::auto_vary::Notifier::notify);
 
-        if let Some(target) = parts.headers.get(HX_TARGET)
-            && let Ok(target) = target.to_str()
-        {
-            return Ok(HxTarget(Some(target.to_string())));
+        if let Some(target) = parts.headers.get(HX_TARGET) {
+            if let Ok(target) = target.to_str() {
+                return Ok(HxTarget(Some(target.to_string())));
+            }
         }
 
         Ok(HxTarget(None))
@@ -203,10 +203,10 @@ where
             .get_mut::<crate::auto_vary::HxTriggerNameExtracted>()
             .map(crate::auto_vary::Notifier::notify);
 
-        if let Some(trigger_name) = parts.headers.get(HX_TRIGGER_NAME)
-            && let Ok(trigger_name) = trigger_name.to_str()
-        {
-            return Ok(HxTriggerName(Some(trigger_name.to_string())));
+        if let Some(trigger_name) = parts.headers.get(HX_TRIGGER_NAME) {
+            if let Ok(trigger_name) = trigger_name.to_str() {
+                return Ok(HxTriggerName(Some(trigger_name.to_string())));
+            }
         }
 
         Ok(HxTriggerName(None))
@@ -237,10 +237,10 @@ where
             .get_mut::<crate::auto_vary::HxTriggerExtracted>()
             .map(crate::auto_vary::Notifier::notify);
 
-        if let Some(trigger) = parts.headers.get(HX_TRIGGER)
-            && let Ok(trigger) = trigger.to_str()
-        {
-            return Ok(HxTrigger(Some(trigger.to_string())));
+        if let Some(trigger) = parts.headers.get(HX_TRIGGER) {
+            if let Ok(trigger) = trigger.to_str() {
+                return Ok(HxTrigger(Some(trigger.to_string())));
+            }
         }
 
         Ok(HxTrigger(None))
