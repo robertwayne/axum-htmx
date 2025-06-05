@@ -16,68 +16,66 @@ use crate::{HxError, headers};
 /// See <https://htmx.org/headers/hx-location/> for more information.
 #[derive(Debug, Clone)]
 pub struct HxLocation {
-    /// Uri of the new location.
-    pub uri: String,
+    /// URI path of the new location.
+    pub path: String,
     /// Extra options.
     #[cfg(feature = "serde")]
     #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
-    pub options: LocationOptions,
+    pub options: Option<LocationOptions>,
 }
 
 impl HxLocation {
-    /// Parses `uri` and sets it as location.
+    /// Sets `path` as the location.
     #[allow(clippy::should_implement_trait)]
-    pub fn from_str(uri: impl AsRef<str>) -> Self {
+    pub fn from_path(path: impl AsRef<str>) -> Self {
         Self {
+            path: path.as_ref().to_owned(),
             #[cfg(feature = "serde")]
-            options: LocationOptions::default(),
-            uri: uri.as_ref().to_string(),
+            options: None,
         }
     }
 
-    /// Parses `uri` and sets it as location with additional options.
+    /// Sets `path` as the location with additional options.
     #[cfg(feature = "serde")]
     #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
-    pub fn from_str_with_options(uri: impl AsRef<str>, options: LocationOptions) -> Self {
+    pub fn from_path_with_options(path: impl AsRef<str>, options: LocationOptions) -> Self {
         Self {
-            options,
-            uri: uri.as_ref().to_string(),
+            path: path.as_ref().to_string(),
+            options: Some(options),
         }
     }
 
-    #[cfg(feature = "serde")]
     fn into_header_with_options(self) -> Result<String, HxError> {
-        if self.options.is_default() {
-            return Ok(self.uri.to_string());
+        match self.options {
+            Some(options) => {
+                #[derive(serde::Serialize)]
+                struct FlattenedHxLocation<'a> {
+                    path: &'a str,
+                    #[serde(flatten)]
+                    options: &'a LocationOptions,
+                }
+                let loc_with_opts = FlattenedHxLocation {
+                    path: &self.path,
+                    options: &options,
+                };
+                Ok(serde_json::to_string(&loc_with_opts)?)
+            }
+            _ => Ok(self.path),
         }
-
-        #[derive(::serde::Serialize)]
-        struct LocWithOpts {
-            path: String,
-            #[serde(flatten)]
-            opts: LocationOptions,
-        }
-
-        let loc_with_opts = LocWithOpts {
-            path: self.uri.to_string(),
-            opts: self.options,
-        };
-
-        Ok(serde_json::to_string(&loc_with_opts)?)
     }
 }
 
 impl<'a> From<&'a str> for HxLocation {
-    fn from(uri: &'a str) -> Self {
-        Self::from_str(uri)
+    fn from(path: &'a str) -> Self {
+        Self::from_path(path)
     }
 }
 
 #[cfg(feature = "serde")]
 #[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
 impl<'a> From<(&'a str, LocationOptions)> for HxLocation {
-    fn from((uri, options): (&'a str, LocationOptions)) -> Self {
-        Self::from_str_with_options(uri, options)
+    fn from((path, options): (&'a str, LocationOptions)) -> Self {
+        Self::from_path_with_options(path, options)
     }
 }
 
@@ -88,7 +86,7 @@ impl IntoResponseParts for HxLocation {
         #[cfg(feature = "serde")]
         let header = self.into_header_with_options()?;
         #[cfg(not(feature = "serde"))]
-        let header = self.uri.to_string();
+        let header = self.path.to_string();
 
         res.headers_mut().insert(
             headers::HX_LOCATION,
@@ -138,29 +136,8 @@ pub struct LocationOptions {
     // Hacky way of making this struct non-exhaustive.
     // See <https://rust-lang.github.io/rfcs/2008-non-exhaustive.html> and <https://github.com/robertwayne/axum-htmx/issues/29> for reasoning.
     #[serde(skip)]
-    pub non_exhaustive: (),
-}
-
-#[cfg(feature = "serde")]
-#[cfg_attr(feature = "unstable", doc(cfg(feature = "serde")))]
-impl LocationOptions {
-    pub(super) fn is_default(&self) -> bool {
-        let Self {
-            source: None,
-            event: None,
-            handler: None,
-            target: None,
-            swap: None,
-            values: None,
-            headers: None,
-            non_exhaustive: (),
-        } = self
-        else {
-            return false;
-        };
-
-        true
-    }
+    #[doc(hidden)]
+    pub _non_exhaustive: (),
 }
 
 #[cfg(test)]
@@ -175,7 +152,7 @@ mod tests {
         let loc = HxLocation::from("/foo");
         assert_eq!(loc.into_header_with_options().unwrap(), "/foo");
 
-        let loc = HxLocation::from_str_with_options(
+        let loc = HxLocation::from_path_with_options(
             "/foo",
             LocationOptions {
                 event: Some("click".into()),
