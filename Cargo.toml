@@ -39,7 +39,7 @@ futures = { version = "0.3", default-features = false, features = [
 
 [dev-dependencies]
 axum = { version = "0.8", default-features = false }
-axum-test = "17"
+axum-test = "18"
 tokio = { version = "1", features = ["full"] }
 tokio-test = "0.4"
 

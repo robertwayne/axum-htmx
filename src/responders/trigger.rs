@@ -188,6 +188,7 @@ impl IntoResponseParts for HxResponseTrigger {
 }
 
 #[cfg(test)]
+#[cfg(feature = "serde")]
 mod tests {
     use http::HeaderValue;
     use serde_json::json;

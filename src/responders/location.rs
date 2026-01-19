@@ -164,11 +164,11 @@ impl LocationOptions {
 }
 
 #[cfg(test)]
+#[cfg(feature = "serde")]
 mod tests {
     use super::*;
 
     #[test]
-    #[cfg(feature = "serde")]
     fn test_serialize_location() {
         use crate::SwapOption;
 
