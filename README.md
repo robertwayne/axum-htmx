@@ -55,6 +55,8 @@ type.
 | `HX-Target`                  | `HxTarget`                | `Option<String>`          |
 | `HX-Trigger-Name`            | `HxTriggerName`           | `Option<String>`          |
 | `HX-Trigger`                 | `HxTrigger`               | `Option<String>`          |
+| `HX-Source-Name`             | `HxSourceName`            | `Option<String>`          |
+| `HX-Source`                  | `HxSource`                | `Option<String>`          |
 
 ## Responders
 
@@ -96,6 +98,8 @@ Refer to [caching htmx docs section][htmx-caching] for details.
 | `Vary: HX-Target`       | `VaryHxTarget`      |
 | `Vary: HX-Trigger`      | `VaryHxTrigger`     |
 | `Vary: HX-Trigger-Name` | `VaryHxTriggerName` |
+| `Vary: HX-Source`       | `VaryHxSource`      |
+| `Vary: HX-Source-Name`  | `VaryHxSourceName`  |
 
 Look at the [Auto Caching Management](#auto-caching-management) section for
 automatic `Vary` headers management.

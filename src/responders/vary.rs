@@ -7,6 +7,8 @@ const HX_REQUEST: HeaderValue = HeaderValue::from_static(headers::HX_REQUEST_STR
 const HX_TARGET: HeaderValue = HeaderValue::from_static(headers::HX_TARGET_STR);
 const HX_TRIGGER: HeaderValue = HeaderValue::from_static(headers::HX_TRIGGER_STR);
 const HX_TRIGGER_NAME: HeaderValue = HeaderValue::from_static(headers::HX_TRIGGER_NAME_STR);
+const HX_SOURCE: HeaderValue = HeaderValue::from_static(headers::HX_SOURCE_STR);
+const HX_SOURCE_NAME: HeaderValue = HeaderValue::from_static(headers::HX_SOURCE_NAME_STR);
 
 /// The `Vary: HX-Request` header.
 ///
@@ -125,6 +127,63 @@ impl extractors::HxTriggerName {
     /// Convenience method to create the corresponding `Vary` response header
     pub fn vary_response() -> VaryHxTriggerName {
         VaryHxTriggerName
+    }
+}
+/// The `Vary: HX-Source` header.
+///
+/// You may want to add this header to the response if your handler responds
+/// differently based on the `HX-Source` request header.
+///
+/// You probably need this only for `GET` requests, as other HTTP methods are
+/// not cached by default.
+///
+/// See <https://htmx.org/docs/#caching> for more information.
+#[derive(Debug, Clone)]
+pub struct VaryHxSource;
+
+impl IntoResponseParts for VaryHxSource {
+    type Error = HxError;
+
+    fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
+        res.headers_mut().try_append(VARY, HX_SOURCE)?;
+
+        Ok(res)
+    }
+}
+
+impl extractors::HxSource {
+    /// Convenience method to create the corresponding `Vary` response header
+    pub fn vary_response() -> VaryHxSource {
+        VaryHxSource
+    }
+}
+
+/// The `Vary: HX-Source-Name` header.
+///
+/// You may want to add this header to the response if your handler responds
+/// differently based on the `HX-Source-Name` request header.
+///
+/// You probably need this only for `GET` requests, as other HTTP methods are
+/// not cached by default.
+///
+/// See <https://htmx.org/docs/#caching> for more information.
+#[derive(Debug, Clone)]
+pub struct VaryHxSourceName;
+
+impl IntoResponseParts for VaryHxSourceName {
+    type Error = HxError;
+
+    fn into_response_parts(self, mut res: ResponseParts) -> Result<ResponseParts, Self::Error> {
+        res.headers_mut().try_append(VARY, HX_SOURCE_NAME)?;
+
+        Ok(res)
+    }
+}
+
+impl extractors::HxSourceName {
+    /// Convenience method to create the corresponding `Vary` response header
+    pub fn vary_response() -> VaryHxSourceName {
+        VaryHxSourceName
     }
 }
 

@@ -4,8 +4,8 @@ use axum_core::extract::FromRequestParts;
 use http::request::Parts;
 
 use crate::{
-    HX_BOOSTED, HX_CURRENT_URL, HX_HISTORY_RESTORE_REQUEST, HX_PROMPT, HX_REQUEST, HX_TARGET,
-    HX_TRIGGER, HX_TRIGGER_NAME,
+    HX_BOOSTED, HX_CURRENT_URL, HX_HISTORY_RESTORE_REQUEST, HX_PROMPT, HX_REQUEST, HX_SOURCE,
+    HX_SOURCE_NAME, HX_TARGET, HX_TRIGGER, HX_TRIGGER_NAME,
 };
 
 /// The `HX-Boosted` header.
@@ -244,5 +244,73 @@ where
         }
 
         Ok(HxTrigger(None))
+    }
+}
+
+/// The `HX-Source-Name` header.
+///
+/// This is set when a request is made from an element that has the `hx-source`
+/// attribute set. The value will contain the source element's name. If the
+/// name does not exist on the page, the value will be None.
+///
+/// This extractor will always return a value. If the header is not present, it
+/// will return `None`.
+#[derive(Debug, Clone)]
+pub struct HxSourceName(pub Option<String>);
+
+impl<S> FromRequestParts<S> for HxSourceName
+where
+    S: Send + Sync,
+{
+    type Rejection = std::convert::Infallible;
+
+    async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
+        #[cfg(feature = "auto-vary")]
+        parts
+            .extensions
+            .get_mut::<crate::auto_vary::HxSourceNameExtracted>()
+            .map(crate::auto_vary::Notifier::notify);
+
+        if let Some(source_name) = parts.headers.get(HX_SOURCE_NAME) {
+            if let Ok(source_name) = source_name.to_str() {
+                return Ok(HxSourceName(Some(source_name.to_string())));
+            }
+        }
+
+        Ok(HxSourceName(None))
+    }
+}
+
+/// The `HX-Source` header.
+///
+/// This is set when a request is made from an element that has the `hx-source`
+/// attribute set. The value will contain the source element's id. If the id
+/// does not exist on the page, the value will be None.
+///
+/// This extractor will always return a value. If the header is not present, it
+/// will return `None`.
+#[derive(Debug, Clone)]
+pub struct HxSource(pub Option<String>);
+
+impl<S> FromRequestParts<S> for HxSource
+where
+    S: Send + Sync,
+{
+    type Rejection = std::convert::Infallible;
+
+    async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
+        #[cfg(feature = "auto-vary")]
+        parts
+            .extensions
+            .get_mut::<crate::auto_vary::HxSourceExtracted>()
+            .map(crate::auto_vary::Notifier::notify);
+
+        if let Some(source) = parts.headers.get(HX_SOURCE) {
+            if let Ok(source) = source.to_str() {
+                return Ok(HxSource(Some(source.to_string())));
+            }
+        }
+
+        Ok(HxSource(None))
     }
 }
