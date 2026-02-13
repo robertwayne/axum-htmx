@@ -20,17 +20,20 @@ use tower::{Layer, Service};
 
 use crate::{
     HxError,
-    headers::{HX_REQUEST_STR, HX_TARGET_STR, HX_TRIGGER_NAME_STR, HX_TRIGGER_STR},
+    headers::{
+        HX_REQUEST_STR, HX_SOURCE_NAME_STR, HX_SOURCE_STR, HX_TARGET_STR, HX_TRIGGER_NAME_STR,
+        HX_TRIGGER_STR,
+    },
 };
 #[cfg(doc)]
-use crate::{HxRequest, HxTarget, HxTrigger, HxTriggerName};
+use crate::{HxRequest, HxSource, HxSourceName, HxTarget, HxTrigger, HxTriggerName};
 
 const MIDDLEWARE_DOUBLE_USE: &str =
     "Configuration error: `axum_httpx::vary_middleware` is used twice";
 
 /// Addresses [htmx caching issues](https://htmx.org/docs/#caching)
 /// by automatically adding a corresponding `Vary` header when
-/// [`HxRequest`], [`HxTarget`], [`HxTrigger`], [`HxTriggerName`]
+/// [`HxRequest`], [`HxTarget`], [`HxTrigger`], [`HxTriggerName`], [`HxSource`], [`HxSourceName`]
 /// or their combination is used.
 #[derive(Clone)]
 pub struct AutoVaryLayer;
@@ -80,7 +83,9 @@ define_notifiers!(
     HxRequestExtracted,
     HxTargetExtracted,
     HxTriggerExtracted,
-    HxTriggerNameExtracted
+    HxTriggerNameExtracted,
+    HxSourceExtracted,
+    HxSourceNameExtracted
 );
 
 impl<S> Layer<S> for AutoVaryLayer {
@@ -111,6 +116,8 @@ where
             (HxTargetExtracted::insert(exts), HX_TARGET_STR),
             (HxTriggerExtracted::insert(exts), HX_TRIGGER_STR),
             (HxTriggerNameExtracted::insert(exts), HX_TRIGGER_NAME_STR),
+            (HxSourceExtracted::insert(exts), HX_SOURCE_STR),
+            (HxSourceNameExtracted::insert(exts), HX_SOURCE_NAME_STR),
         ];
         let future = self.inner.call(request);
         Box::pin(async move {
@@ -148,7 +155,7 @@ mod tests {
     use axum::{Router, routing::get};
 
     use super::*;
-    use crate::{HxRequest, HxTarget, HxTrigger, HxTriggerName};
+    use crate::{HxRequest, HxSource, HxSourceName, HxTarget, HxTrigger, HxTriggerName};
 
     fn vary_headers(resp: &axum_test::TestResponse) -> Vec<HeaderValue> {
         resp.iter_headers_by_name("vary").cloned().collect()
@@ -161,13 +168,22 @@ mod tests {
             .route("/hx-target", get(|_: HxTarget| async { () }))
             .route("/hx-trigger", get(|_: HxTrigger| async { () }))
             .route("/hx-trigger-name", get(|_: HxTriggerName| async { () }))
+            .route("/hx-source", get(|_: HxSource| async { () }))
+            .route("/hx-source-name", get(|_: HxSourceName| async { () }))
             .route(
                 "/repeated-extractor",
                 get(|_: HxRequest, _: HxRequest| async { () }),
             )
             .route(
                 "/multiple-extractors",
-                get(|_: HxRequest, _: HxTarget, _: HxTrigger, _: HxTriggerName| async { () }),
+                get(
+                    |_: HxRequest,
+                     _: HxTarget,
+                     _: HxTrigger,
+                     _: HxTriggerName,
+                     _: HxSource,
+                     _: HxSourceName| async { () },
+                ),
             )
             .layer(AutoVaryLayer);
         axum_test::TestServer::new(app).unwrap()
@@ -211,6 +227,22 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn single_hx_source() {
+        assert_eq!(
+            vary_headers(&server().get("/hx-source").await),
+            ["hx-source"]
+        );
+    }
+
+    #[tokio::test]
+    async fn single_hx_source_name() {
+        assert_eq!(
+            vary_headers(&server().get("/hx-source-name").await),
+            ["hx-source-name"]
+        );
+    }
+
+    #[tokio::test]
     async fn repeated_extractor() {
         assert_eq!(
             vary_headers(&server().get("/repeated-extractor").await),
@@ -223,7 +255,7 @@ mod tests {
     async fn multiple_extractors() {
         assert_eq!(
             vary_headers(&server().get("/multiple-extractors").await),
-            ["hx-request, hx-target, hx-trigger, hx-trigger-name"],
+            ["hx-request, hx-target, hx-trigger, hx-trigger-name, hx-source, hx-source-name"],
         );
     }
 }

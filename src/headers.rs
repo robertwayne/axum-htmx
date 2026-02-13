@@ -35,6 +35,12 @@ pub(crate) const HX_TRIGGER_NAME_STR: &str = "hx-trigger-name";
 /// The `name` of the triggered element, if it exists.
 pub const HX_TRIGGER_NAME: HeaderName = HeaderName::from_static(HX_TRIGGER_NAME_STR);
 
+pub(crate) const HX_SOURCE_NAME_STR: &str = "hx-source-name";
+
+/// The `name` of the source element, if it exists.
+/// Htmx Four only
+pub const HX_SOURCE_NAME: HeaderName = HeaderName::from_static(HX_SOURCE_NAME_STR);
+
 /// Allows you to do a client-side redirect that does not do a full page reload.
 pub const HX_LOCATION: HeaderName = HeaderName::from_static("hx-location");
 
@@ -75,6 +81,15 @@ pub(crate) const HX_TRIGGER_STR: &str = "hx-trigger";
 ///
 /// See <https://htmx.org/headers/hx-trigger/> for more information.
 pub const HX_TRIGGER: HeaderName = HeaderName::from_static(HX_TRIGGER_STR);
+
+pub(crate) const HX_SOURCE_STR: &str = "hx-source";
+
+/// Contains the `id` of the source element that triggered the
+/// request.
+///
+/// Htmx Four only
+/// See <https://four.htmx.org/reference/#request_headers> for more information.
+pub const HX_SOURCE: HeaderName = HeaderName::from_static(HX_SOURCE_STR);
 
 /// Allows you to trigger client-side events.
 ///
